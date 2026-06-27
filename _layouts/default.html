@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page.title }} · {{ site.title }}</title>
+    <meta name="description" content="{{ site.description }}" />
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <img
+        src="{{ '/assets/img/logo.png' | relative_url }}"
+        alt="{{ site.title }} logo"
+      />
+      <p class="tagline">{{ site.description }}</p>
+    </header>
+    <div class="flag-bar"></div>
+
+    <main class="content">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        {{ site.title }} &middot; Powered by
+        <a href="https://meshcore.io">MeshCore</a>
+      </p>
+    </footer>
+  </body>
+</html>

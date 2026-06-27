@@ -1,0 +1,96 @@
+/* Dixie Mesh branding — palette pulled from the logo */
+:root {
+  --brand-red: #e4252b;
+  --brand-blue: #1560c2;
+  --brand-blue-dark: #0d3f80;
+  --brand-orange: #f26a21;
+  --brand-green: #2fb44a;
+  --brand-navy: #0b1b2b;
+  --brand-white: #ffffff;
+  --text: #1c2733;
+  --muted: #5a6b7b;
+  --bg: #f7fafc;
+  --card: #ffffff;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a { color: var(--brand-blue); }
+a:hover { color: var(--brand-blue-dark); }
+
+/* Header */
+.site-header {
+  background: var(--brand-navy);
+  border-bottom: 4px solid var(--brand-red);
+  text-align: center;
+  padding: 2.25rem 1rem 2rem;
+}
+
+.site-header img {
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+}
+
+.site-header .tagline {
+  margin: 0.75rem 0 0;
+  color: #cdd9e5;
+  font-size: 1.05rem;
+}
+
+/* Accent bar echoing the logo's red / white / blue flag */
+.flag-bar {
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    var(--brand-red) 0 33.33%,
+    var(--brand-white) 33.33% 66.66%,
+    var(--brand-blue) 66.66% 100%
+  );
+}
+
+/* Content */
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+.content h1 {
+  color: var(--brand-blue-dark);
+  border-bottom: 3px solid var(--brand-orange);
+  padding-bottom: 0.35rem;
+  margin-top: 0;
+}
+
+.content h2 {
+  color: var(--brand-blue);
+  margin-top: 2rem;
+}
+
+.content ul { padding-left: 1.25rem; }
+.content li { margin: 0.35rem 0; }
+
+.content strong { color: var(--brand-navy); }
+
+/* Footer */
+.site-footer {
+  border-top: 4px solid var(--brand-green);
+  background: var(--brand-navy);
+  color: #aebccb;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.site-footer a { color: #cdd9e5; }
