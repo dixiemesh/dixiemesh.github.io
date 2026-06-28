@@ -78,6 +78,11 @@ These are just two of the many options available for easy purchase:
 
 **Build your own**
 
+Rolling your own node can be a lot of fun — and it's often cheaper. If you have
+access to a 3D printer it's even better: there are tons of community-designed
+cases out there, so you can print an enclosure tailored to your board, antenna,
+and battery (or design your own).
+
 MeshCore runs on a range of inexpensive LoRa boards. For Southern Utah you want
 a board for the **US 915 MHz** band. Popular, well-supported choices include:
 
