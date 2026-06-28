@@ -43,8 +43,7 @@ isn't reaching a repeater.
 4. **Review geography.** Use the [live map](https://mesh.bnanzarc.com/#/live) or
    the in-app line-of-sight tools to see what's between you and the nearest
    repeater.
-5. **Confirm your TX power** matches what your board supports.
-6. If none of that helps, the likely culprits are **antenna placement, an indoor
+5. If none of that helps, the likely culprits are **antenna placement, an indoor
    setup, or hardware limits.** Get the antenna higher and outdoors.
 
 ## "It used to work"
