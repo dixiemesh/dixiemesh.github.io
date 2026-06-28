@@ -128,12 +128,13 @@ public key, so it works out of the box on every node:
 ### Naming your node
 
 Pick a name that helps people find you on the map and tells repeaters from
-companions at a glance. A simple convention:
+companions at a glance.
 
-- **Repeaters:** `DM-<place>-RPT` — e.g. `DM-StGeorge-RPT`, `DM-Hurricane-RPT`
-- **Companions:** `DM-<yourname>` — e.g. `DM-Adam`
-
-The `DM-` prefix makes Dixie Mesh nodes easy to spot among other meshes.
+- **Repeaters:** include the location and end the name with **`Repeater`** —
+  e.g. `St George Ridge Repeater`, `Hurricane Repeater`. The trailing
+  `Repeater` makes infrastructure nodes easy to spot in the node list.
+- **Companions:** name it anything familiar to you — your name, callsign, or a
+  nickname all work fine.
 
 ## Verifying your node works
 
