@@ -66,7 +66,7 @@ or **build your own** from a supported board.
 
 **Pre-built / ready-to-use**
 
-- **[Seeed Studio Wio Tracker L1 Pro](https://www.seeedstudio.com/Wio-Tracker-L1-Pro-p-6454.html)**
+- **<a href="https://www.seeedstudio.com/Wio-Tracker-L1-Pro-p-6454.html" target="_blank" rel="noopener">Seeed Studio Wio Tracker L1 Pro</a>**
   — a complete handheld with screen, GPS, and battery; great if you'd rather not
   assemble anything. Just confirm you get the **915 MHz (US)** version and flash
   MeshCore.
