@@ -33,5 +33,15 @@
         <a href="https://meshcore.io">MeshCore</a>
       </p>
     </footer>
+
+    <script>
+      // Open all external links in a new tab.
+      document.querySelectorAll('a[href]').forEach(function (a) {
+        if (a.hostname && a.hostname !== window.location.hostname) {
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+        }
+      });
+    </script>
   </body>
 </html>
