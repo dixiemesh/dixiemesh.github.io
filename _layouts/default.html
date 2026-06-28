@@ -17,6 +17,11 @@
     </header>
     <div class="flag-bar"></div>
 
+    <nav class="site-nav">
+      <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Introduction</a>
+      <a href="{{ '/getting-started/' | relative_url }}"{% if page.url contains 'getting-started' %} class="active"{% endif %}>Getting Started</a>
+    </nav>
+
     <main class="content">
       {{ content }}
     </main>
