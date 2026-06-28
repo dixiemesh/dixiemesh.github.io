@@ -125,9 +125,6 @@ public key, so it works out of the box on every node:
 8b3387e9c5cdea6ac9e5edbaa115cd72
 ```
 
-> The third character is a capital letter **O**, not a zero, if you ever enter
-> the key by hand.
-
 ### Naming your node
 
 Pick a name that helps people find you on the map and tells repeaters from
