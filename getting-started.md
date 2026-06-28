@@ -146,6 +146,12 @@ companions at a glance.
    **ping** or **trace** to a known node to confirm the path and see how many
    hops away it is.
 
+> **Quick "is my signal getting out?" test:** Join the **`#test`** channel,
+> send a test message, and watch the app. It will show whether your message was
+> repeated by a repeater — if you see it relayed, your signal is reaching the
+> mesh. The `#test` channel is the polite place for this so you're not cluttering
+> the public channel.
+
 No responses? Don't panic — see below.
 
 ## Still unsure?
