@@ -31,19 +31,22 @@ a:hover { color: var(--brand-blue-dark); }
 /* Header */
 .site-header {
   background: var(--brand-navy);
-  border-bottom: 4px solid var(--brand-red);
   text-align: center;
-  padding: 2.25rem 1rem 2rem;
+  padding: 2.25rem 1rem 1.25rem;
+}
+
+.site-brand {
+  display: inline-block;
 }
 
 .site-header img {
-  max-width: 320px;
+  max-width: 300px;
   width: 100%;
   height: auto;
 }
 
 .site-header .tagline {
-  margin: 0.75rem 0 0;
+  margin: 0.6rem 0 0;
   color: #cdd9e5;
   font-size: 1.05rem;
 }
@@ -59,13 +62,12 @@ a:hover { color: var(--brand-blue-dark); }
   );
 }
 
-/* Navigation */
+/* Navigation — integrated into the header */
 .site-nav {
-  background: var(--brand-navy);
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  margin-top: 1.25rem;
   flex-wrap: wrap;
 }
 
@@ -74,18 +76,23 @@ a:hover { color: var(--brand-blue-dark); }
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 4px;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .site-nav a:hover {
   color: var(--brand-white);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .site-nav a.active {
   color: var(--brand-white);
   background: var(--brand-blue);
+  border-color: var(--brand-blue);
 }
 
 /* Content */
