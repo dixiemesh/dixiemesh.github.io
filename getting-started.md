@@ -61,6 +61,18 @@ share only with the people who need it.
 
 ### Supported hardware
 
+You have two paths: **buy a pre-built node** that's ready to use out of the box,
+or **build your own** from a supported board.
+
+**Pre-built / ready-to-use**
+
+- **[Seeed Studio Wio Tracker L1 Pro](https://www.seeedstudio.com/Wio-Tracker-L1-Pro-Meshtastic-p-6457.html)**
+  — a complete handheld with screen, GPS, and battery; great if you'd rather not
+  assemble anything. Just confirm you get the **915 MHz (US)** version and flash
+  MeshCore.
+
+**Build your own**
+
 MeshCore runs on a range of inexpensive LoRa boards. For Southern Utah you want
 a board for the **US 915 MHz** band. Popular, well-supported choices include:
 
