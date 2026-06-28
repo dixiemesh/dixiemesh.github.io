@@ -70,6 +70,9 @@ or **build your own** from a supported board.
   — a complete handheld with screen, GPS, and battery; great if you'd rather not
   assemble anything. Just confirm you get the **915 MHz (US)** version and flash
   MeshCore.
+- **[Elecrow ThinkNode M1](https://www.elecrow.com/thinknode-m1-meshtastic-lora-signal-transceiver-powered-by-nrf52840-with-154-screen-support-gps.html)**
+  — an nRF52840-based handheld with a 1.54" screen and GPS. Another solid
+  ready-to-go option; pick the **915 MHz (US)** version and flash MeshCore.
 
 **Build your own**
 
