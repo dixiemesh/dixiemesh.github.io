@@ -40,9 +40,9 @@ How it works:
 
 1. Open the [Health Check](https://healthcheck.dixiemesh.com). It generates a
    short **test code** for you.
-2. Send that code as a message on the test channel — the same idea as the
-   [`#test` channel check](/getting-started/#verifying-your-node-works) from
-   setup.
+2. Send that code as a message on the **`#dixie-hc`** channel — the same idea as
+   the [`#test` channel check](/getting-started/#verifying-your-node-works) from
+   setup, on the channel the observers watch.
 3. The tool watches for observers reporting your packet and scores your
    **coverage** — how many of them heard you.
 
