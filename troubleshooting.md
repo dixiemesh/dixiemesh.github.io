@@ -28,22 +28,50 @@ You can:
 Make sure you're running **MeshCore** firmware, not Meshtastic — they are not
 compatible and won't talk to each other.
 
+## Check who's hearing you with the Health Check
+
+The **[Dixie Mesh Health Check](https://healthcheck.dixiemesh.com)** answers the
+single most useful question directly: *is my signal actually being heard out on
+the mesh?* Several **observers** — nodes scattered across the network that report
+what they hear — listen for a test message from you and tell you exactly who
+picked it up. It's the fastest way to gauge how effective your signal really is.
+
+How it works:
+
+1. Open the [Health Check](https://healthcheck.dixiemesh.com). It generates a
+   short **test code** for you.
+2. Send that code as a message on the test channel — the same idea as the
+   [`#test` channel check](/getting-started/#verifying-your-node-works) from
+   setup.
+3. The tool watches for observers reporting your packet and scores your
+   **coverage** — how many of them heard you.
+
+For every observer that received your message you'll see **RSSI and SNR** (how
+strong and clean your signal was), the **path** it took and which repeaters
+relayed it, timing details, and a **map** of who heard you and roughly how far
+your packet traveled. That makes it easy to tell a solid, well-heard signal from
+one that's barely scraping in — and to see which directions your coverage is
+strong or weak.
+
 ## "I can hear others, but they can't hear me"
 
 This is the most common issue, and it almost always means your *transmit* path
 isn't reaching a repeater.
 
-1. **Look yourself up in the Analyzer.** Search your node name on the
+1. **Run the [Health Check](https://healthcheck.dixiemesh.com).** Send a test
+   code and see whether any observers hear you. No receipts is a clear sign your
+   TX path isn't reaching the mesh; weak RSSI/SNR points to a marginal one.
+2. **Look yourself up in the Analyzer.** Search your node name on the
    [Analyzer](https://live.dixiemesh.com/#/home). If the network isn't seeing your
    transmissions, that points squarely at your TX path.
-2. **Watch for "repeats heard."** When you send a message, the app indicates if a
+3. **Watch for "repeats heard."** When you send a message, the app indicates if a
    repeater relayed it. No repeat = your signal isn't getting out.
-3. **Check the path on messages you receive.** Note which repeater they came
+4. **Check the path on messages you receive.** Note which repeater they came
    through, and test whether you can reach that repeater directly.
-4. **Review geography.** Use the [live map](https://live.dixiemesh.com/#/live) or
+5. **Review geography.** Use the [live map](https://live.dixiemesh.com/#/live) or
    the in-app line-of-sight tools to see what's between you and the nearest
    repeater.
-5. If none of that helps, the likely culprits are **antenna placement, an indoor
+6. If none of that helps, the likely culprits are **antenna placement, an indoor
    setup, or hardware limits.** Get the antenna higher and outdoors.
 
 ## "It used to work"
