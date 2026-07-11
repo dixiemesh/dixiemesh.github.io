@@ -19,7 +19,7 @@
       <nav class="site-nav">
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Introduction</a>
         <a href="{{ '/getting-started/' | relative_url }}"{% if page.url contains 'getting-started' %} class="active"{% endif %}>Getting Started</a>
-        <a href="https://live.dixiemesh.com">Live Map</a>
+        <a href="https://live.dixiemesh.com/#/live">Live Map</a>
         <a href="{{ '/troubleshooting/' | relative_url }}"{% if page.url contains 'troubleshooting' %} class="active"{% endif %}>Troubleshooting</a>
       </nav>
     </header>
@@ -33,6 +33,9 @@
       <p>
         {{ site.title }} &middot; Powered by
         <a href="https://meshcore.io">MeshCore</a>
+      </p>
+      <p>
+        <a href="mailto:contact@dixiemesh.com">contact@dixiemesh.com</a>
       </p>
     </footer>
 
