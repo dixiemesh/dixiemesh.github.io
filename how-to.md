@@ -35,6 +35,9 @@ list, and you're welcome to spin up your own for a topic or area.
 - **`#alerts`** — Community-wide announcements and heads-up notices: mesh news,
   planned outages, events, and other things worth broadcasting. Not for
   emergencies — see `#emergency` for that.
+- **`#dixiemesh`** — General discussion about Dixie Mesh itself: the network,
+  the [dixiemesh.com](https://dixiemesh.com) website, the
+  [live map](https://live.dixiemesh.com/#/live), and the other community tools.
 - **`#emergency`** — Real-time emergency and life-safety communications **only**.
   Please keep this channel clear so urgent traffic gets through; take
   non-urgent chatter elsewhere.
