@@ -32,24 +32,15 @@ That's it — you'll start seeing traffic on that channel and can post to it.
 These are the common hashtag channels on Dixie Mesh. This isn't an exhaustive
 list, and you're welcome to spin up your own for a topic or area.
 
-- **`#alerts`** — Community-wide announcements and heads-up notices: mesh news,
-  planned outages, events, and other things worth broadcasting. Not for
-  emergencies — see `#emergency` for that.
-- **`#dixiemesh`** — General discussion about Dixie Mesh itself: the network,
-  the [dixiemesh.com](https://dixiemesh.com) website, the
-  [live map](https://live.dixiemesh.com/#/live), and the other community tools.
-- **`#emergency`** — Real-time emergency and life-safety communications **only**.
-  Please keep this channel clear so urgent traffic gets through; take
-  non-urgent chatter elsewhere.
-- **`#hamradio`** — Amateur radio talk: licensing, nets, gear, repeaters, and
-  general ham discussion.
-- **`#repeater-ops`** — For folks running mesh infrastructure. Coordinate
-  repeater placement and configuration, announce maintenance or outages, and
-  compare notes on keeping nodes healthy.
-- **`#test`** — The "can anyone hear me?" channel. Send test messages here to
-  check your signal and confirm a new node is getting out, without cluttering
-  other channels. See [Verifying your node](/getting-started/#verifying-your-node-works).
-- **`#weather`** — Local weather updates and conditions around Southern Utah.
+| Channel | What it's for |
+| --- | --- |
+| **`#alerts`** | Community-wide announcements and heads-up notices: mesh news, planned outages, events, and other things worth broadcasting. Not for emergencies — see `#emergency`. |
+| **`#dixiemesh`** | General discussion about Dixie Mesh itself: the network, the [dixiemesh.com](https://dixiemesh.com) website, the [live map](https://live.dixiemesh.com/#/live), and other community tools. |
+| **`#emergency`** | Real-time emergency and life-safety communications **only**. Keep this channel clear so urgent traffic gets through; take non-urgent chatter elsewhere. |
+| **`#hamradio`** | Amateur radio talk: licensing, nets, gear, repeaters, and general ham discussion. |
+| **`#repeater-ops`** | For folks running mesh infrastructure — coordinate repeater placement and config, announce maintenance or outages, and compare notes on keeping nodes healthy. |
+| **`#test`** | The "can anyone hear me?" channel. Send test messages here to check your signal and confirm a new node is getting out. See [Verifying your node](/getting-started/#verifying-your-node-works). |
+| **`#weather`** | Local weather updates and conditions around Southern Utah. |
 
 > **Channel etiquette:** post on the channel that fits your topic, keep
 > `#emergency` reserved for real emergencies, and remember everything on a public
