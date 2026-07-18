@@ -23,6 +23,7 @@
       <nav class="site-nav">
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Introduction</a>
         <a href="{{ '/getting-started/' | relative_url }}"{% if page.url contains 'getting-started' %} class="active"{% endif %}>Getting Started</a>
+        <a href="{{ '/how-to/' | relative_url }}"{% if page.url contains 'how-to' %} class="active"{% endif %}>How To</a>
         <a href="https://live.dixiemesh.com/#/live">Live Map</a>
         <a href="{{ '/troubleshooting/' | relative_url }}"{% if page.url contains 'troubleshooting' %} class="active"{% endif %}>Troubleshooting</a>
       </nav>
