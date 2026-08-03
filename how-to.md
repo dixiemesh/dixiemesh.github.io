@@ -41,6 +41,7 @@ list, and you're welcome to spin up your own for a topic or area.
 | **`#repeater-ops`** | For folks running mesh infrastructure — coordinate repeater placement and config, announce maintenance or outages, and compare notes on keeping nodes healthy. |
 | **`#test`** | The "can anyone hear me?" channel. Send test messages here to check your signal and confirm a new node is getting out. See [Verifying your node](/getting-started/#verifying-your-node-works). |
 | **`#weather`** | Local weather updates and conditions around Southern Utah. |
+| **`#weekly-net`** | Check-ins for the Wednesday night weekly net. See [net.dixiemesh.com](https://net.dixiemesh.com) for details. |
 
 > **Channel etiquette:** post on the channel that fits your topic, keep
 > `#emergency` reserved for real emergencies, and remember everything on a public
