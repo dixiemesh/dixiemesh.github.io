@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Texting Without Towers: Off-Grid Messaging with MeshCore</title>
+  <style>
+    :root {
+      --ink: #f4f0e7;
+      --muted: #a7b3bd;
+      --bg: #071015;
+      --panel: #0e1b22;
+      --panel2: #13252d;
+      --cyan: #55d6c2;
+      --amber: #f5b942;
+      --red: #ef6b5b;
+      --line: rgba(255,255,255,.12);
+      --shadow: 0 24px 70px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; }
+    .deck { width: 100%; height: 100%; position: relative; background:
+      radial-gradient(circle at 72% 12%, rgba(85,214,194,.08), transparent 28%),
+      linear-gradient(135deg, #09131a, #050b0f 70%); }
+    .slide {
+      position: absolute; inset: 0; padding: clamp(34px, 5vw, 78px);
+      opacity: 0; visibility: hidden; transform: translateX(30px) scale(.985);
+      transition: opacity .35s ease, transform .35s ease, visibility .35s;
+      display: grid; grid-template-rows: auto 1fr auto; gap: 24px;
+    }
+    .slide.active { opacity: 1; visibility: visible; transform: none; z-index: 2; }
+    .slide::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, black, transparent 70%);
+    }
+    .eyebrow { color: var(--cyan); letter-spacing: .16em; text-transform: uppercase; font-size: 13px; font-weight: 800; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(54px, 7.2vw, 112px); line-height: .93; letter-spacing: -.055em; max-width: 1100px; }
+    h2 { font-size: clamp(38px, 5vw, 76px); line-height: 1; letter-spacing: -.045em; max-width: 1100px; }
+    h3 { font-size: clamp(20px, 2vw, 30px); line-height: 1.1; }
+    .lead { font-size: clamp(20px, 2.1vw, 32px); line-height: 1.35; color: #d5dde1; max-width: 1000px; }
+    .small { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .accent { color: var(--amber); }
+    .cyan { color: var(--cyan); }
+    .red { color: var(--red); }
+    .content { position: relative; z-index: 1; align-self: center; width: 100%; }
+    .footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; letter-spacing: .06em; }
+    .footer a { color: inherit; text-decoration: none; }
+    .footer a:hover,.footer a:focus-visible { color: var(--cyan); text-decoration: underline; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; align-items: stretch; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+    .tool-intro-layout { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr); gap:34px; align-items:center; margin-top:28px; }
+    .tool-points { display:grid; gap:16px; }
+    .tool-point { padding:4px 0 4px 20px; border-left:4px solid var(--amber); }
+    .tool-point h3 { font-size:clamp(19px,1.7vw,27px); }
+    .tool-point p { margin-top:6px; color:#b8c4ca; font-size:clamp(15px,1.35vw,20px); line-height:1.42; }
+    .tool-photo { display:block; width:100%; max-height:52vh; aspect-ratio:1.06/1; object-fit:cover; border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); }
+    .card { background: linear-gradient(145deg, rgba(19,37,45,.92), rgba(9,19,25,.88)); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 2.5vw, 34px); box-shadow: var(--shadow); }
+    .card p { color: #c5d0d5; line-height: 1.5; margin-top: 10px; font-size: clamp(15px, 1.35vw, 21px); }
+    .card strong { color: var(--ink); }
+    .build-slide .build-item { opacity:0; transform:translateY(24px) scale(.975); filter:blur(5px); transition:opacity .4s ease,transform .48s cubic-bezier(.2,.8,.2,1),filter .4s ease,border-color .4s ease; }
+    .build-slide .build-item.revealed { opacity:1; transform:none; filter:none; border-color:rgba(85,214,194,.28); }
+    .build-slide .tool-point.build-item.revealed { border-left-color:var(--amber); }
+    .build-slide .spectrum-left.build-item.revealed { border-left-color:var(--cyan); }
+    .build-slide .spectrum-legal.build-item.revealed { border-color:rgba(245,185,66,.45); }
+    .number { font-size: clamp(48px, 6vw, 90px); font-weight: 900; line-height: .9; color: var(--cyan); letter-spacing: -.06em; }
+    .quote { font-size: clamp(26px, 3.2vw, 50px); line-height: 1.18; letter-spacing: -.025em; max-width: 1250px; }
+    .quote::before { content: "“"; color: var(--amber); }
+    .quote::after { content: "”"; color: var(--amber); }
+    .pill { display: inline-flex; gap: 8px; align-items: center; border-radius: 999px; padding: 7px 12px; border: 1px solid var(--line); background: rgba(255,255,255,.045); color: #d7e1e5; font-size: 13px; }
+    .pills { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 18px; }
+    ul.clean { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+    ul.clean li { position: relative; padding-left: 24px; font-size: clamp(17px, 1.65vw, 25px); line-height: 1.35; color: #d4dde1; }
+    ul.clean li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--cyan); position: absolute; left: 0; top: .55em; box-shadow: 0 0 18px rgba(85,214,194,.5); }
+    .hero { background-image: linear-gradient(90deg, rgba(4,10,14,.95) 0%, rgba(4,10,14,.76) 43%, rgba(4,10,14,.1) 78%), url("assets/utah-lora-hero.png"); background-size: cover; background-position: center; }
+    .hero::before { opacity: .05; }
+    .hero .content { align-self: end; padding-bottom: 6vh; }
+    .title-slide h1 { line-height:1.05; }
+    .hero .subtitle { margin-top: 24px; max-width: 720px; font-size: clamp(18px, 2vw, 28px); color: #c8d2d7; }
+    .band { display: flex; align-items: center; gap: 0; margin-top: 32px; }
+    .band .seg { height: 70px; min-width: 70px; flex: 1; border-right: 1px solid #061015; background: var(--panel2); display: grid; place-items: center; color: var(--muted); font-size: 12px; position: relative; }
+    .band .seg.active { background: linear-gradient(180deg, var(--amber), #ca8223); color: #111; font-weight: 900; flex: 3.2; }
+    .band .seg.active::after { content: "902–928 MHz ISM"; position: absolute; bottom: -28px; color: var(--amber); white-space: nowrap; font-size: 14px; }
+    .scale { display: flex; justify-content: space-between; margin-top: 33px; color: var(--muted); font-size: 13px; }
+    .spectrum-slide .content { align-self:start; padding-top:clamp(14px,3vh,32px); }
+    .spectrum-title { max-width: 1500px; font-size: clamp(36px, 4.2vw, 68px); }
+    .spectrum-layout { display:grid; grid-template-columns:minmax(300px,.8fr) minmax(0,1.35fr); gap:clamp(28px,3vw,48px); margin-top:30px; align-items:stretch; }
+    .spectrum-left { padding-left:clamp(18px,2vw,30px); border-left:5px solid var(--cyan); }
+    .spectrum-legal { min-height:100%; display:flex; flex-direction:column; justify-content:center; border-color:rgba(245,185,66,.45); }
+    .spectrum-legal h3 { font-size:clamp(24px,2.2vw,34px); }
+    .spectrum-kicker { color:var(--amber); font-size:12px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; }
+    .spectrum-big { margin-top:18px; font-size:clamp(48px,5vw,76px); font-weight:900; line-height:.91; letter-spacing:-.055em; }
+    .spectrum-big span { display:block; }
+    .spectrum-summary { max-width:520px; margin-top:20px; color:#bac6cc; font-size:clamp(14px,1.18vw,18px); line-height:1.42; }
+    .spectrum-benefits { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:20px; padding-top:15px; border-top:1px solid var(--line); }
+    .spectrum-benefits b,.spectrum-benefits span { display:block; }
+    .spectrum-benefits b { color:var(--cyan); font-size:15px; }
+    .spectrum-benefits span { margin-top:5px; color:var(--muted); font-size:12px; line-height:1.3; }
+    .regional-bands { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:13px; padding-top:24px; }
+    .regional-bands::before { content:""; position:absolute; left:7%; right:7%; top:9px; height:6px; border-radius:999px; background:linear-gradient(90deg,#6489c9,var(--cyan),#72d1b8,var(--amber)); }
+    .regional-band { position:relative; text-align:center; }
+    .regional-band::before { content:""; position:absolute; top:-23px; left:50%; width:18px; height:18px; transform:translateX(-50%); border:4px solid var(--ink); border-radius:50%; background:#6f7c82; box-shadow:0 0 0 3px var(--bg); }
+    .regional-band b,.regional-band span { display:block; }
+    .regional-band b { color:#b4c0c4; font-size:clamp(39px,4vw,62px); line-height:1; letter-spacing:-.05em; }
+    .regional-band.active b { color:var(--amber); }
+    .regional-band span { margin-top:4px; color:var(--muted); font-size:clamp(11px,1vw,15px); }
+    .preset-box { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:clamp(28px,2.8vw,44px); align-items:center; margin-top:30px; padding:22px 26px; border:1px solid rgba(245,185,66,.58); border-radius:18px; background:rgba(245,185,66,.045); }
+    .preset-frequency { color:var(--amber); font-size:clamp(34px,3.65vw,56px); font-weight:900; line-height:.95; letter-spacing:-.05em; white-space:nowrap; }
+    .preset-copy b { color:var(--amber); font-size:clamp(16px,1.45vw,22px); line-height:1.25; }
+    .preset-copy p { margin-top:6px; color:var(--muted); font-size:clamp(12px,1.1vw,16px); line-height:1.35; }
+    .spectrum-warning { margin-top:22px; padding-left:16px; border-left:4px solid var(--red); color:var(--muted); font-size:clamp(12px,1.08vw,16px); line-height:1.4; }
+    .spectrum-warning strong { color:var(--red); }
+    .trade { height: 330px; position: relative; border-left: 2px solid var(--line); border-bottom: 2px solid var(--line); margin: 0 30px 36px 55px; }
+    .trade::before { content: "RANGE / SENSITIVITY"; position: absolute; transform: rotate(-90deg); left: -94px; top: 120px; color: var(--muted); font-size: 12px; letter-spacing: .12em; }
+    .trade::after { content: "DATA RATE →"; position: absolute; right: 0; bottom: -32px; color: var(--muted); font-size: 12px; letter-spacing: .12em; }
+    .curve { position: absolute; inset: 20px 10px 5px 15px; border-top: 8px solid var(--cyan); border-radius: 100% 0 0 0; transform: skewY(-31deg); transform-origin: left top; filter: drop-shadow(0 0 12px rgba(85,214,194,.3)); }
+    .trade-label { position: absolute; padding: 9px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-weight: 800; }
+    .whisper { left: 8%; top: 15%; color: var(--cyan); }
+    .broadband { right: 2%; bottom: 6%; color: var(--red); }
+    .range-record-slide { background-image:linear-gradient(180deg,rgba(3,9,14,.28) 0%,rgba(3,9,14,.05) 58%,rgba(3,9,14,.52) 100%),url("assets/lora-distance-records.png"); background-size:cover; background-position:center; }
+    .range-record-slide::before { opacity:.05; }
+    .range-record-slide .content { align-self:start; height:100%; }
+    .range-record-title { max-width:1400px; font-size:clamp(40px,4.8vw,68px); text-shadow:0 3px 28px rgba(0,0,0,.75); }
+    .range-records { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(28px,4vw,64px); margin-top:26px; }
+    .range-record { padding:14px 22px 16px; border-left:5px solid var(--cyan); background:linear-gradient(90deg,rgba(4,12,18,.82),rgba(4,12,18,.18)); text-shadow:0 2px 16px rgba(0,0,0,.7); }
+    .range-record.point { border-left-color:var(--amber); }
+    .range-record-label { color:var(--cyan); font-size:17px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    .range-record.point .range-record-label { color:var(--amber); }
+    .range-distance { display:flex; align-items:baseline; gap:14px; margin-top:7px; }
+    .range-distance strong { color:var(--ink); font-size:clamp(68px,7.2vw,104px); line-height:.82; letter-spacing:-.06em; }
+    .range-distance span { color:var(--ink); font-size:clamp(23px,2.2vw,32px); font-weight:900; }
+    .range-record p { margin-top:8px; color:#d5dfe3; font-size:18px; line-height:1.35; font-weight:700; }
+    .range-record-caveat { position:absolute; left:0; right:0; bottom:16px; width:fit-content; max-width:960px; margin:auto; padding:10px 18px; border:1px solid rgba(255,255,255,.18); border-radius:999px; background:rgba(4,11,16,.78); color:#d6e0e4; font-size:17px; line-height:1.35; text-align:center; backdrop-filter:blur(6px); }
+    .legal-split { display: grid; grid-template-columns: 1fr 100px 1fr; gap: 20px; align-items: stretch; }
+    .versus { display: grid; place-items: center; color: var(--muted); font-weight: 900; font-size: 18px; }
+    .legal-split .card { min-height: 340px; }
+    .legal-split .card.part15 { border-color: rgba(245,185,66,.45); }
+    .legal-split .card.ham { opacity: .58; }
+    .waterfall { height: 330px; overflow: hidden; position: relative; border-radius: 18px; border: 1px solid var(--line); background: linear-gradient(180deg,#020509,#061722); box-shadow: inset 0 0 60px rgba(0,0,0,.7); cursor:pointer; transition:border-color .2s ease,box-shadow .2s ease; }
+    .waterfall:hover,.waterfall:focus-visible { border-color:var(--cyan); box-shadow:inset 0 0 60px rgba(0,0,0,.7),0 0 0 3px rgba(85,214,194,.14); outline:none; }
+    .waterfall::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 7px, rgba(255,255,255,.025) 8px); pointer-events: none; }
+    .chirp { position: absolute; width: 45%; height: 4px; background: linear-gradient(90deg, transparent, var(--cyan), #fff, var(--amber), transparent); transform: rotate(-18deg); filter: blur(.3px) drop-shadow(0 0 6px var(--cyan)); opacity: .85; animation: drift 3.8s linear infinite; }
+    .chirp:nth-child(2){ left: 28%; animation-delay: -1.2s; }
+    .chirp:nth-child(3){ left: 57%; animation-delay: -2.6s; }
+    .chirp:nth-child(4){ left: -8%; animation-delay: -.4s; }
+    @keyframes drift { from { top: -30px; } to { top: 360px; } }
+    .play { margin-top: 18px; background: var(--amber); color: #111; border: 0; border-radius: 999px; padding: 12px 18px; font-weight: 900; cursor: pointer; }
+    .lora-basics { display:grid; grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr); gap:30px; align-items:start; margin-top:22px; }
+    .lora-basics .lead { font-size:clamp(20px,1.8vw,26px); }
+    .radio-facts { display:grid; grid-template-columns:1fr; margin-top:16px; }
+    .radio-fact { display:flex; align-items:baseline; justify-content:space-between; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .radio-fact span { color:var(--muted); font-size:18px; }
+    .radio-fact strong { color:var(--cyan); font-size:26px; }
+    .lora-waterfall-column { min-width:0; }
+    .lora-waterfall-note { margin-top:16px; color:#c8d2d7; font-size:17px; line-height:1.4; }
+    .lora-basics .play { margin-top:14px; }
+    .reliability-title { max-width:1500px; font-size:clamp(38px,4.2vw,62px); }
+    .ack-flow { display:grid; grid-template-columns:1fr 62px 1fr 62px 1fr; align-items:center; gap:12px; margin-top:28px; }
+    .ack-node { min-height:180px; display:grid; align-content:center; justify-items:center; padding:22px 20px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(145deg,rgba(19,37,45,.92),rgba(8,17,22,.86)); box-shadow:var(--shadow); text-align:center; }
+    .ack-node-icon { color:var(--cyan); font-size:42px; line-height:1; }
+    .ack-node:nth-of-type(5) .ack-node-icon { color:var(--amber); }
+    .ack-node h3 { margin-top:8px; font-size:27px; }
+    .ack-node p { margin-top:6px; color:#bec9ce; font-size:17px; line-height:1.35; }
+    .ack-arrow { color:var(--amber); font-size:44px; line-height:1; text-align:center; }
+    .ack-return { grid-column:1 / -1; position:relative; height:42px; margin:14px 10% 0; border-top:4px dashed var(--cyan); }
+    .ack-return::before { content:""; position:absolute; left:-2px; top:-10px; width:15px; height:15px; border-left:4px solid var(--cyan); border-bottom:4px solid var(--cyan); transform:rotate(45deg); }
+    .ack-return::after { content:"ACK returns to sender"; position:absolute; left:50%; top:-16px; transform:translateX(-50%); padding:3px 12px; background:var(--bg); color:var(--cyan); font-size:16px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+    .ack-outcomes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:14px; }
+    .ack-outcome { min-height:108px; padding:18px 20px; border-left:4px solid var(--cyan); background:rgba(85,214,194,.065); }
+    .ack-outcome.missing { border-color:var(--red); background:rgba(239,107,91,.06); }
+    .build-slide .ack-return.build-item.revealed { border-color:var(--cyan); }
+    .build-slide .ack-outcome.build-item.revealed { border-color:var(--cyan); }
+    .build-slide .ack-outcome.missing.build-item.revealed { border-color:var(--red); }
+    .ack-outcome strong { color:var(--cyan); font-size:21px; }
+    .ack-outcome.missing strong { color:var(--red); }
+    .ack-outcome p { margin-top:4px; color:#c4ced3; font-size:17px; line-height:1.35; }
+    .ack-caveat { margin-top:10px; color:var(--muted); font-size:15px; line-height:1.35; text-align:center; }
+    .mesh-compare { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:22px; }
+    .mesh-card { padding:18px 20px 14px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(145deg,rgba(19,37,45,.94),rgba(8,17,22,.92)); box-shadow:var(--shadow); }
+    .mesh-card-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:8px; }
+    .mesh-card-head span { color:var(--muted); font-size:12px; text-align:right; }
+    .network-map { width:100%; height:auto; display:block; overflow:visible; }
+    .network-map .base-link { stroke:rgba(255,255,255,.18); stroke-width:3; stroke-linecap:round; }
+    .network-map .route { fill:none; stroke:var(--amber); stroke-width:5; stroke-linecap:round; opacity:0; stroke-dasharray:10 13; filter:drop-shadow(0 0 5px rgba(245,185,66,.7)); }
+    .network-map .radio-ring { fill:#0b171d; stroke:var(--cyan); stroke-width:3; filter:drop-shadow(0 0 7px rgba(85,214,194,.25)); }
+    .network-map .repeater-ring { fill:#251b0d; stroke:var(--amber); stroke-width:4; filter:drop-shadow(0 0 7px rgba(245,185,66,.28)); }
+    .network-map .node-label { fill:var(--ink); font-size:13px; font-weight:800; text-anchor:middle; }
+    .network-map .role-label { fill:var(--muted); font-size:10px; text-anchor:middle; letter-spacing:.08em; }
+    .network-map .packet-dot { fill:#fff; opacity:0; filter:drop-shadow(0 0 8px var(--amber)); }
+    .routing-card { position:relative; overflow:hidden; }
+    .routing-card::after { content:""; position:absolute; inset:auto 18px 0; height:3px; border-radius:999px; background:var(--amber); opacity:.65; }
+    .routing-card.path-card::after { background:var(--cyan); }
+    .routing-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--line); border-radius:999px; color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .routing-map .topology-link { stroke:rgba(255,255,255,.17); stroke-width:3; stroke-linecap:round; }
+    .routing-map .flood-route { fill:none; stroke:var(--red); stroke-width:5; stroke-linecap:round; stroke-dasharray:9 12; opacity:.58; filter:drop-shadow(0 0 5px rgba(239,107,91,.42)); }
+    .routing-map .known-path-base { fill:none; stroke:var(--cyan); stroke-width:8; stroke-linecap:round; opacity:.25; }
+    .routing-map .known-route { fill:none; stroke:var(--cyan); stroke-width:6; stroke-linecap:round; stroke-dasharray:16 18; opacity:1; filter:drop-shadow(0 0 6px rgba(85,214,194,.55)); }
+    .routing-map .off-path { opacity:.32; }
+    .slide.active .routing-demo .flood-map .flood-route { animation:floodRoutingCycle 2.2s linear infinite; }
+    .slide.active .routing-demo .path-map .known-route { animation:knownPathCycle 2.6s linear infinite; }
+    .mesh-note { margin-top:6px; color:var(--muted); font-size:12px; line-height:1.35; }
+    @keyframes floodRoutingCycle {
+      0% { stroke-dashoffset:84; opacity:1; }
+      100% { stroke-dashoffset:0; opacity:1; }
+    }
+    @keyframes knownPathCycle {
+      0% { stroke-dashoffset:136; opacity:1; }
+      100% { stroke-dashoffset:0; opacity:1; }
+    }
+    .routing-fallback { margin:16px auto 0; color:var(--muted); font-size:12px; line-height:1.35; max-width:620px; text-align:center; }
+    .node-role-list { display:grid; gap:13px; margin-top:26px; }
+    .node-role-row { display:grid; grid-template-columns:68px minmax(210px,.72fr) minmax(0,1.55fr); gap:20px; align-items:center; padding:15px 20px; border:1px solid var(--line); border-radius:17px; background:linear-gradient(145deg,rgba(19,37,45,.82),rgba(8,17,22,.75)); }
+    .node-role-glyph { width:58px; height:58px; display:grid; place-items:center; border:3px solid var(--cyan); border-radius:50%; color:var(--cyan); font-size:25px; font-weight:900; box-shadow:0 0 22px rgba(85,214,194,.12); }
+    .node-role-row.repeater .node-role-glyph { border-color:var(--amber); color:var(--amber); box-shadow:0 0 22px rgba(245,185,66,.13); }
+    .node-role-row.room .node-role-glyph { border-color:var(--red); color:var(--red); box-shadow:0 0 22px rgba(239,107,91,.12); }
+    .node-role-row h3 { font-size:clamp(20px,1.8vw,28px); }
+    .node-role-row p { color:#bdc8cd; font-size:clamp(14px,1.2vw,18px); line-height:1.38; }
+    .node-role-rule { margin-top:16px; padding:14px 18px; border-left:4px solid var(--cyan); background:rgba(85,214,194,.065); color:#cbd5d9; font-size:clamp(14px,1.18vw,17px); line-height:1.4; }
+    .node-role-rule strong { color:var(--cyan); }
+    .metric { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 16px 0; }
+    .metric span:last-child { font-size: 28px; font-weight: 900; color: var(--cyan); }
+    .dbm-strip { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-top:30px; }
+    .dbm-cell { padding:18px 12px; text-align:center; border-top:3px solid var(--cyan); background:rgba(14,27,34,.78); }
+    .dbm-cell b { display:block; font-size:clamp(25px,2.7vw,42px); color:var(--ink); }
+    .dbm-cell span { display:block; margin-top:6px; color:var(--muted); font-size:13px; }
+    .formula { margin-top:24px; padding:20px 24px; border-left:4px solid var(--amber); background:rgba(245,185,66,.07); color:#e9edf0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:clamp(16px,1.55vw,24px); line-height:1.5; }
+    .site-card { min-height:235px; display:flex; flex-direction:column; justify-content:space-between; }
+    .site-card .site-id { font-size:clamp(44px,5vw,76px); font-weight:900; color:var(--amber); letter-spacing:-.06em; }
+    .site-card small { color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+    .dixie-logo-card { min-height:300px; display:grid; place-items:center; padding:18px 24px; border:1px solid var(--line); border-radius:20px; background:rgba(255,255,255,.025); box-shadow:var(--shadow); }
+    .dixie-logo-card img { display:block; width:100%; max-height:300px; object-fit:contain; filter:drop-shadow(0 18px 28px rgba(0,0,0,.32)); }
+    .network-snapshot-slide .content { align-self:start; }
+    .network-snapshot-title { max-width:1400px; font-size:clamp(36px,4.25vw,62px); }
+    .network-snapshot-layout { display:grid; grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr); gap:clamp(24px,3vw,42px); align-items:stretch; margin-top:22px; }
+    .network-snapshot-figure { min-width:0; width:fit-content; max-width:100%; margin:0; display:grid; align-content:start; justify-self:start; }
+    .network-snapshot-figure img { display:block; width:auto; max-width:100%; height:min(58vh,430px); object-fit:contain; border:1px solid var(--line); border-radius:20px; background:#e9e6dc; box-shadow:var(--shadow); }
+    .network-snapshot-figure figcaption { margin-top:9px; color:var(--muted); font-size:17px; line-height:1.35; }
+    .network-snapshot-stats { display:grid; grid-template-rows:repeat(3,auto) 1fr; gap:0; align-content:start; border-left:1px solid var(--line); }
+    .network-snapshot-stat { padding:14px 0 14px 22px; border-bottom:1px solid var(--line); }
+    .network-snapshot-stat:first-child { padding-top:2px; }
+    .network-snapshot-stat .label { display:block; color:var(--cyan); font-size:17px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    .network-snapshot-stat:nth-child(2) .label { color:var(--amber); }
+    .network-snapshot-stat:nth-child(3) .label { color:var(--red); }
+    .network-snapshot-stat p { margin-top:7px; color:#d7e0e3; font-size:clamp(17px,1.45vw,22px); line-height:1.42; font-weight:700; }
+    .network-snapshot-stat strong { color:var(--ink); font-size:1.12em; }
+    .network-snapshot-date { align-self:end; padding:14px 0 0 22px; color:var(--muted); font-size:17px; line-height:1.35; }
+    .meshcore-goals-title { max-width:1400px; font-size:clamp(40px,4.8vw,68px); }
+    .meshcore-goals-subtitle { margin-top:12px; color:var(--muted); font-size:20px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .meshcore-goals-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(34px,5vw,76px); margin-top:28px; }
+    .meshcore-goal { display:grid; grid-template-columns:58px minmax(0,1fr); gap:16px; align-items:start; min-height:118px; padding:18px 0; border-top:1px solid var(--line); }
+    .meshcore-goal-number { color:var(--cyan); font-size:30px; font-weight:900; line-height:1; letter-spacing:-.04em; }
+    .meshcore-goal:nth-child(2n) .meshcore-goal-number { color:var(--amber); }
+    .meshcore-goal p { color:#d6dfe3; font-size:clamp(19px,1.65vw,24px); line-height:1.35; font-weight:750; }
+    .meshcore-goal strong { color:var(--ink); }
+    .practical-tools-slide .content { align-self:start; }
+    .practical-tools-title { max-width:1400px; font-size:clamp(38px,4.5vw,64px); }
+    .tool-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); gap:clamp(14px,1.45vw,22px); height:min(59vh,500px); min-height:0; margin-top:20px; }
+    .tool-shot { min-width:0; min-height:0; display:grid; grid-template-rows:minmax(0,1fr) auto; padding:0; overflow:hidden; color:var(--ink); text-align:left; border:1px solid var(--line); border-radius:18px; background:#0b171b; box-shadow:0 16px 36px rgba(0,0,0,.24); cursor:zoom-in; transition:border-color .2s,transform .2s,box-shadow .2s; }
+    .tool-shot img { display:block; width:100%; height:100%; min-height:0; object-fit:cover; object-position:center top; }
+    .tool-shot span { display:flex; align-items:center; gap:11px; min-height:58px; padding:10px 14px; font-size:clamp(17px,1.28vw,19px); font-weight:800; line-height:1.2; }
+    .tool-shot b { color:var(--cyan); font:800 16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing:.08em; }
+    .tool-shot:hover,.tool-shot:focus-visible { border-color:var(--cyan); transform:translateY(-2px); box-shadow:0 20px 44px rgba(0,0,0,.34); outline:none; }
+    .live-traffic { display:block; width:min(100%,1140px); max-height:54vh; object-fit:contain; margin:24px auto 0; border:1px solid var(--line); border-radius:18px; background:#020508; box-shadow:var(--shadow); }
+    .tool-card { appearance:none; width:100%; color:var(--ink); text-align:left; cursor:pointer; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+    .tool-card:hover,.tool-card:focus-visible { transform:translateY(-4px); border-color:var(--cyan); box-shadow:0 24px 70px rgba(0,0,0,.42),0 0 0 3px rgba(85,214,194,.14); outline:none; }
+    .tool-card-title { display:block; margin-top:10px; font-size:clamp(20px,2vw,30px); line-height:1.1; font-weight:800; }
+    .tool-card-copy { display:block; margin-top:10px; color:#c5d0d5; font-size:clamp(15px,1.35vw,21px); line-height:1.5; font-weight:400; }
+    .tool-open { display:inline-block; margin-top:18px; color:var(--cyan); font-size:13px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .tool-modal { position:fixed; inset:0; z-index:100; display:none; place-items:center; padding:28px; background:rgba(3,8,11,.96); backdrop-filter:blur(10px); }
+    .tool-modal.show { display:grid; }
+    .tool-modal-panel { width:min(1500px,100%); height:min(92vh,920px); display:grid; grid-template-rows:auto minmax(0,1fr); gap:16px; }
+    .tool-modal-head { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .tool-modal-head h3 { font-size:clamp(26px,3vw,46px); }
+    .tool-modal-close { width:48px; height:48px; flex:0 0 auto; border:1px solid var(--line); border-radius:50%; background:var(--panel2); color:var(--ink); font-size:28px; cursor:pointer; }
+    .tool-modal-images { min-height:0; display:grid; grid-template-columns:1fr; gap:18px; place-items:center; }
+    .tool-modal-images.dual { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .tool-modal-images img { display:block; width:100%; height:100%; min-height:0; object-fit:contain; border:1px solid var(--line); border-radius:16px; background:#020508; box-shadow:var(--shadow); }
+    .los-title { max-width:1500px; font-size:clamp(35px,4.2vw,64px); }
+    .path-profile { margin-top:20px; overflow:hidden; border:1px solid var(--line); border-radius:20px; background:#081d2d; box-shadow:var(--shadow); }
+    .path-profile svg { display:block; width:100%; height:auto; }
+    .profile-grid { stroke:rgba(205,223,232,.11); stroke-width:1; }
+    .profile-axis { fill:#aebfcb; font-size:16px; font-weight:400; }
+    .profile-terrain { fill:#5e5043; stroke:#a9db39; stroke-width:3; stroke-linejoin:round; }
+    .profile-fresnel { fill:rgba(205,70,101,.28); stroke:rgba(239,107,91,.5); stroke-width:2; animation:fresnelPulse 4s ease-in-out infinite; }
+    .profile-los { fill:none; stroke:#e8f0f2; stroke-width:3; stroke-dasharray:9 9; }
+    .profile-clearance { fill:none; stroke:#f5b942; stroke-width:4; }
+    .profile-mast { stroke:#f4f0e7; stroke-width:5; stroke-linecap:round; }
+    .profile-radio { fill:#071015; stroke:#55d6c2; stroke-width:4; }
+    .profile-label { fill:#f4f0e7; font-size:18px; font-weight:400; }
+    .profile-label.muted { fill:#b9c6cd; font-size:15px; font-weight:400; }
+    .profile-label .amber { fill:#f5b942; }
+    .profile-label .red { fill:#ef6b5b; }
+    .profile-obstruction { fill:#ef6b5b; stroke:#f4f0e7; stroke-width:2; filter:drop-shadow(0 0 7px rgba(239,107,91,.7)); }
+    @keyframes fresnelPulse { 0%,100% { fill-opacity:.72; } 50% { fill-opacity:1; } }
+    .path-lessons { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .path-lesson { padding:13px 16px; border-top:4px solid var(--cyan); background:rgba(14,27,34,.76); }
+    .path-lesson:nth-child(2) { border-color:var(--ink); }
+    .path-lesson:nth-child(3) { border-color:var(--amber); }
+    .path-lesson.height { order:1; border-color:var(--cyan); }
+    .path-lesson.line-of-sight { order:2; border-color:var(--ink); }
+    .path-lesson.fresnel { order:3; border-color:var(--amber); }
+    .build-slide .path-lesson.height.build-item.revealed { border-color:var(--cyan); }
+    .build-slide .path-lesson.line-of-sight.build-item.revealed { border-color:var(--ink); }
+    .build-slide .path-lesson.fresnel.build-item.revealed { border-color:var(--amber); }
+    .path-lesson b { display:block; color:var(--ink); font-size:19px; }
+    .path-lesson span { display:block; margin-top:5px; color:#bbc7cd; font-size:16px; line-height:1.3; }
+    .compare { width: 100%; border-collapse: collapse; font-size: clamp(14px, 1.25vw, 19px); }
+    .compare th, .compare td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .compare th { color: var(--muted); font-size: 12px; letter-spacing:.12em; text-transform:uppercase; }
+    .compare td:first-child { color: var(--muted); width: 20%; }
+    .compare td:nth-child(2) { border-left: 2px solid rgba(85,214,194,.4); }
+    .compare td:nth-child(3) { border-left: 2px solid rgba(245,185,66,.4); }
+    .devices { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .device { min-height: 170px; display:flex; flex-direction:column; justify-content:space-between; }
+    .device .icon { height:72px; display:grid; place-items:center; font-size:44px; filter: grayscale(.1); }
+    .device p { font-size:14px; }
+    .hardware-title { max-width:1500px; font-size:clamp(35px,4.2vw,64px); }
+    .hardware-compare { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:22px; }
+    .hardware-panel { padding:20px 24px; border:1px solid var(--line); border-top:4px solid var(--amber); border-radius:19px; background:linear-gradient(145deg,rgba(19,37,45,.9),rgba(8,17,22,.84)); box-shadow:var(--shadow); }
+    .hardware-panel.nrf { border-top-color:var(--cyan); }
+    .hardware-slide .eyebrow { font-size:17px; }
+    .hardware-kicker { color:var(--amber); font-size:17px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+    .hardware-panel.nrf .hardware-kicker { color:var(--cyan); }
+    .hardware-panel h3 { margin-top:6px; font-size:clamp(23px,2.2vw,34px); }
+    .hardware-chip { margin-top:6px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:clamp(17px,1.2vw,19px); font-weight:700; }
+    .hardware-endurance { display:flex; align-items:flex-end; gap:16px; margin:18px 0 14px; }
+    .hardware-endurance strong { color:var(--amber); font-size:clamp(45px,4.5vw,70px); line-height:.86; letter-spacing:-.06em; }
+    .hardware-panel.nrf .hardware-endurance strong { color:var(--cyan); }
+    .hardware-endurance span { padding-bottom:2px; color:var(--muted); font-size:17px; line-height:1.25; }
+    .hardware-battery { position:relative; height:23px; margin:0 8px 16px 0; padding:3px; border:2px solid rgba(244,240,231,.48); border-radius:6px; }
+    .hardware-battery::after { content:""; position:absolute; right:-8px; top:5px; width:6px; height:10px; border-radius:0 3px 3px 0; background:rgba(244,240,231,.48); }
+    .hardware-battery i { display:block; width:24%; height:100%; border-radius:3px; background:linear-gradient(90deg,var(--red),var(--amber)); }
+    .hardware-panel.nrf .hardware-battery i { width:88%; background:linear-gradient(90deg,var(--cyan),#86e8af); }
+    .hardware-points { list-style:none; display:grid; gap:7px; margin:0; padding:0; }
+    .hardware-points li { position:relative; padding-left:20px; color:#cbd5d9; font-size:clamp(18px,1.35vw,20px); line-height:1.35; }
+    .hardware-points li::before { content:""; position:absolute; left:0; top:.48em; width:8px; height:8px; border-radius:50%; background:var(--amber); }
+    .hardware-panel.nrf .hardware-points li::before { background:var(--cyan); }
+    .hardware-mission { margin-top:14px; padding:11px 16px; border-top:1px solid var(--line); color:#cbd5d9; font-size:18px; line-height:1.35; text-align:center; }
+    .hardware-mission strong { color:var(--ink); }
+    .hardware-caveat { margin-top:7px; color:var(--muted); font-size:15px; line-height:1.35; text-align:center; }
+    .hardware-slide .source { font-size:13px; }
+    .plan { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .step { padding:22px; border:1px solid var(--line); border-radius:18px; background:rgba(15,30,37,.8); min-height:155px; position:relative; }
+    .step b { display:block; color:var(--amber); font-size:34px; margin-bottom:14px; }
+    .step span { color:#d2dcdf; line-height:1.35; }
+    .controls { position: fixed; right: 18px; bottom: 18px; z-index: 60; display:flex; gap:8px; opacity:.78; transition:.2s; }
+    .controls:hover { opacity:1; }
+    .controls button { width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:rgba(8,17,22,.88); color:var(--ink); cursor:pointer; }
+    .progress { position:fixed; z-index:20; left:0; bottom:0; height:4px; background:linear-gradient(90deg,var(--cyan),var(--amber)); transition:width .3s ease; }
+    .counter { position:fixed; z-index:20; left:20px; bottom:18px; color:var(--muted); font-size:12px; letter-spacing:.1em; }
+    .overview { position:fixed; inset:0; z-index:40; background:#050b0f; padding:30px; overflow:auto; display:none; grid-template-columns:repeat(4,minmax(220px,1fr)); gap:14px; }
+    .overview.show { display:grid; }
+    .thumb { aspect-ratio:16/9; border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:16px; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; }
+    .thumb:hover { border-color:var(--cyan); transform:translateY(-2px); }
+    .thumb b { font-size:16px; }
+    .thumb span { color:var(--muted); font-size:11px; }
+    .source { color:var(--muted); font-size:11px; }
+    .source a { color:var(--cyan); }
+    @media (max-width: 850px) {
+      .slide { padding: 30px 26px 54px; overflow:auto; }
+      .grid2,.grid3,.legal-split,.devices,.plan,.dbm-strip,.tool-intro-layout,.spectrum-layout,.preset-box,.path-lessons,.hardware-compare,.lora-basics,.network-snapshot-layout,.range-records,.meshcore-goals-grid { grid-template-columns:1fr; }
+      .ack-flow,.ack-outcomes { grid-template-columns:1fr; }
+      .ack-arrow { transform:rotate(90deg); }
+      .ack-return { grid-column:1; }
+      .spectrum-benefits,.regional-bands { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .preset-frequency { white-space:normal; }
+      .tool-photo { max-height:45vh; aspect-ratio:auto; object-fit:contain; }
+      .network-snapshot-figure img { height:auto; max-height:none; }
+      .network-snapshot-stats { border-left:0; }
+      .range-record-slide { overflow:auto; }
+      .range-record-caveat { position:static; margin:20px 0 0; border-radius:18px; }
+      .tool-gallery { grid-template-columns:1fr; grid-template-rows:none; height:auto; }
+      .tool-shot img { height:240px; }
+      .versus { display:none; }
+      .mesh-compare { grid-template-columns:1fr; }
+      .node-role-row { grid-template-columns:58px 1fr; }
+      .node-role-row p { grid-column:1 / -1; }
+      .overview.show { grid-template-columns:1fr 1fr; }
+      .tool-modal { padding:16px; }
+      .tool-modal-images.dual { grid-template-columns:1fr; overflow:auto; }
+      .tool-modal-images.dual img { height:auto; max-height:none; }
+    }
+    @media (max-height:760px) and (min-width:851px) {
+      .slide { padding:32px 44px; gap:16px; }
+      .spectrum-slide .content { padding-top:8px; }
+      .spectrum-title { font-size:44px; }
+      .spectrum-layout { margin-top:20px; gap:26px; }
+      .spectrum-big { margin-top:12px; font-size:50px; }
+      .spectrum-summary { margin-top:12px; font-size:14px; }
+      .spectrum-benefits { margin-top:12px; padding-top:10px; }
+      .regional-band b { font-size:42px; }
+      .preset-box { margin-top:28px; padding:22px 24px; }
+      .preset-frequency { font-size:38px; }
+      .preset-copy b { font-size:17px; }
+      .preset-copy p,.spectrum-warning { font-size:13px; }
+      .spectrum-warning { margin-top:24px; }
+    }
+    @media (min-width:851px) {
+      .eyebrow { font-size:17px; }
+      .footer,.source { font-size:13px; }
+      .footer > span:last-child { margin-right:220px; white-space:nowrap; }
+      .small { font-size:18px; }
+      .pill { font-size:17px; }
+      .tool-point p,.card p,.tool-card-copy { font-size:clamp(18px,1.45vw,22px); }
+      .band .seg { font-size:16px; }
+      .band .seg.active::after { font-size:17px; }
+      .scale { font-size:16px; }
+      .spectrum-kicker { font-size:17px; }
+      .spectrum-summary { font-size:18px; }
+      .spectrum-benefits b { font-size:18px; }
+      .spectrum-benefits span { font-size:16px; }
+      .regional-band span { font-size:17px; }
+      .preset-copy p,.spectrum-warning { font-size:17px; }
+      .trade::before,.trade::after { font-size:16px; }
+      .trade-label { font-size:18px; }
+      .mesh-card-head span { font-size:16px; }
+      .network-map .node-label { font-size:17px; }
+      .network-map .role-label { font-size:15px; }
+      .routing-badge { font-size:15px; }
+      .mesh-note,.routing-fallback { font-size:17px; }
+      .node-role-row p,.node-role-rule { font-size:18px; }
+      .metric span:first-child { font-size:18px; }
+      .dbm-cell span { font-size:17px; }
+      .tool-open { font-size:16px; }
+      .profile-axis { font-size:18px; }
+      .profile-label.muted { font-size:17px; }
+      .path-lesson span { font-size:18px; }
+      .compare { font-size:18px; }
+      .compare th { font-size:16px; }
+      .device p { font-size:18px; }
+      .step span,.site-card small { font-size:18px; }
+      .play { font-size:18px; }
+    }
+    @media (max-height:760px) and (min-width:851px) {
+      .routing-demo > h2 { font-size:clamp(40px,4.3vw,58px); }
+      .routing-demo .mesh-compare { margin-top:16px; }
+      .routing-demo .network-map { height:235px; }
+    }
+  </style>
+</head>
+<body>
+<main class="deck" id="deck">
+  <section class="slide hero title-slide active" data-title="Title">
+    <div><span class="eyebrow">01 · Dixie Amateur Radio Club Presentation</span></div>
+    <div class="content">
+      <h1>Texting Without Towers: <span class="accent">Off-Grid Messaging with MeshCore</span></h1>
+      <p class="subtitle">A simple, secure, off-grid, mesh communications system.</p>
+      <div class="pills"><span class="pill">Low Power</span><span class="pill">No subscription</span><span class="pill">No internet required</span></div>
+    </div>
+    <div class="footer"><span>ADAM CARTWRIGHT · WØAKO · <a href="mailto:adam@w0ako.com">adam@w0ako.com</a></span><span>Use ← → to navigate · O for overview</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="Why this matters">
+    <div><span class="eyebrow">02 · The opportunity</span></div>
+    <div class="content">
+      <h2>Why this matters to <span class="accent">DARC</span></h2>
+      <div class="grid3" style="margin-top:34px">
+        <div class="card build-item"><div class="number">01</div><h3>Familiar RF instincts</h3><p>Antennas, terrain, link budgets, and good operating practice still rule.</p></div>
+        <div class="card build-item"><div class="number">02</div><h3>Tiny digital radios</h3><p>Short text, positions, and telemetry from low-cost battery-powered nodes.</p></div>
+        <div class="card build-item"><div class="number">03</div><h3>Useful without commercial infrastructure</h3><p>No cell service, Wi-Fi, internet connection, or even commercial power required.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>THE TOOLBOX GETS ONE TOOL BIGGER</span><span>2 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="The tool">
+    <div><span class="eyebrow">03 · The tool</span></div>
+    <div class="content">
+      <h2 style="font-size:clamp(36px,4.7vw,70px)">MeshCore is an off-grid messaging protocol built for <span class="accent">small radios and deliberate roles.</span></h2>
+      <div class="tool-intro-layout">
+        <div class="tool-points">
+          <div class="tool-point build-item"><h3>Local by design</h3><p>LoRa carries text and telemetry without internet, Wi-Fi, or a central telecom service.</p></div>
+          <div class="tool-point build-item"><h3>Decentralized</h3><p>Messages travel directly or through independently powered repeaters.</p></div>
+          <div class="tool-point build-item"><h3>Purposeful traffic</h3><p>Companion devices do not repeat every packet, which protects battery life and shared airtime.</p></div>
+          <div class="tool-point build-item"><h3>Open and adaptable</h3><p>The firmware supports companion, repeater, room-server, and sensor roles across many LoRa devices.</p></div>
+        </div>
+        <img class="tool-photo" src="assets/pp_4500258.png" alt="Hand holding a compact MeshCore LoRa radio with an antenna">
+      </div>
+    </div>
+    <div class="footer"><span>SMALL RADIOS · CLEAR ROLES · PURPOSEFUL TRAFFIC</span><span>3 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="LoRa radio basics">
+    <div><span class="eyebrow">04 · Radio basics</span></div>
+    <div class="content">
+      <h2>LoRa looks like <span class="cyan">sweeping chirps</span></h2>
+      <div class="lora-basics">
+        <div>
+          <p class="lead">LoRa is the physical-layer modulation, not the messaging system. Chirp spread spectrum trades speed for sensitivity, range, and power efficiency.</p>
+          <div class="radio-facts">
+            <div class="radio-fact"><span>Physical layer</span><strong>RF</strong></div>
+            <div class="radio-fact"><span>Signal shape</span><strong>Chirps</strong></div>
+            <div class="radio-fact"><span>Best payload</span><strong>Short</strong></div>
+            <div class="radio-fact"><span>Power budget</span><strong>Low</strong></div>
+          </div>
+        </div>
+        <div class="lora-waterfall-column">
+          <div class="waterfall" id="chirpWaterfall" role="button" tabindex="0" aria-label="Animated illustration of LoRa chirps sweeping across an SDR waterfall. Click to hear an illustrative chirp."><i class="chirp"></i><i class="chirp"></i><i class="chirp"></i><i class="chirp"></i></div>
+          <p class="lora-waterfall-note">On an SDR waterfall: diagonal energy moving across the channel, not FM, SSB, APRS, RTTY, or packet.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>RF MODULATION · CHIRPS · SHORT PAYLOADS · LOW POWER</span><span>4 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Range vs data rate">
+    <div><span class="eyebrow">05 · The core tradeoff</span></div>
+    <div class="content grid2">
+      <div>
+        <h2>Range and sensitivity come from <span class="accent">giving up speed</span></h2>
+        <p class="quote" style="margin-top:40px">A very efficient whisper that can travel a long way—if everyone takes turns.</p>
+      </div>
+      <div class="card">
+        <div class="trade"><div class="curve"></div><span class="trade-label whisper">LoRa sweet spot</span><span class="trade-label broadband">Broadband</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>NOT VOICE · NOT FILE TRANSFER · NOT HIGH TRAFFIC</span><span>5 / 24</span></div>
+  </section>
+
+  <section class="slide range-record-slide" data-title="LoRa distance records">
+    <div><span class="eyebrow">06 · Long-range records</span></div>
+    <div class="content">
+      <h2 class="range-record-title">LoRa really does mean <span class="accent">long range.</span></h2>
+      <div class="range-records">
+        <div class="range-record">
+          <div class="range-record-label">Documented LoRa mesh hop</div>
+          <div class="range-distance"><strong>≈206</strong><span>miles</span></div>
+          <p>331 km · Meshtastic ground-to-ground record</p>
+        </div>
+        <div class="range-record point">
+          <div class="range-record-label">Documented point-to-point reception</div>
+          <div class="range-distance"><strong>830</strong><span>miles</span></div>
+          <p>1,336 km · Fishing vessel to Canary Islands gateway</p>
+        </div>
+      </div>
+      <p class="range-record-caveat">Record paths are exceptional. Ordinary range still depends on height, line of sight, antennas, radio settings, and propagation.</p>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://meshtastic.org/docs/overview/range-tests/">Meshtastic range tests</a> · <a href="https://www.thethingsnetwork.org/article/new-lora-world-record-1336-km-830-mi">The Things Network</a></span><span>6 / 24</span></div>
+  </section>
+
+  <section class="slide spectrum-slide build-slide" data-title="Part 15 legal framing and regional settings">
+    <div><span class="eyebrow">07 · Legal framing</span></div>
+    <div class="content">
+      <h2 class="spectrum-title">We are usually operating as <span class="accent">Part 15 users.</span></h2>
+      <div class="spectrum-layout">
+        <div class="card part15 spectrum-legal build-item">
+          <h3 class="accent">Part 15 / ISM operation</h3>
+          <ul class="clean" style="margin-top:24px">
+            <li>No amateur license required</li>
+            <li>Encryption is allowed</li>
+            <li>Non-hams can participate</li>
+            <li>Accept interference; cause none</li>
+          </ul>
+        </div>
+        <div class="build-item">
+          <div class="spectrum-kicker">Common regional hardware bands</div>
+          <div class="regional-bands">
+            <div class="regional-band"><b>433</b><span>MHz · selected regions</span></div>
+            <div class="regional-band"><b>868</b><span>MHz · commonly Europe</span></div>
+            <div class="regional-band active"><b>915</b><span>MHz · United States</span></div>
+          </div>
+          <div class="preset-box">
+            <div class="preset-frequency">910.525 MHz</div>
+            <div class="preset-copy"><b>MeshCore USA/Canada recommended preset</b><p>Within the U.S. 902–928 MHz band. Dixie Mesh also uses 62.5 kHz bandwidth, SF7, and CR5.</p></div>
+          </div>
+          <div class="spectrum-warning"><strong>License-exempt is not rule-free.</strong> Use region-correct hardware and comply with local power, duty-cycle, equipment, and interference requirements. U.S. Part 15 devices must accept interference.</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://dixiemesh.com/getting-started/">Dixie Mesh</a> · <a href="https://meshcore.io/">MeshCore</a> · <a href="https://www.ecfr.gov/current/title-47/section-15.5">47 CFR §15.5</a></span><span>7 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="MeshCore routing">
+    <div><span class="eyebrow">08 · MeshCore routing</span></div>
+    <div class="content routing-demo" id="meshDemo">
+      <h2>Flood to discover. <span class="accent">Follow the path once known.</span></h2>
+      <div class="mesh-compare">
+        <article class="mesh-card routing-card build-item" data-build-step="1">
+          <div class="mesh-card-head"><h3 class="red">01 · Flood routing</h3><span class="routing-badge">No path known</span></div>
+          <svg class="network-map routing-map flood-map" viewBox="0 0 520 280" role="img" aria-label="Flood routing from node A through four repeaters to node B">
+            <g>
+              <line class="topology-link" x1="55" y1="140" x2="165" y2="55"/><line class="topology-link" x1="55" y1="140" x2="180" y2="225"/>
+              <line class="topology-link" x1="165" y1="55" x2="330" y2="90"/><line class="topology-link" x1="180" y1="225" x2="330" y2="90"/>
+              <line class="topology-link" x1="180" y1="225" x2="355" y2="225"/><line class="topology-link" x1="330" y1="90" x2="465" y2="140"/>
+              <line class="topology-link" x1="355" y1="225" x2="465" y2="140"/>
+              <path class="flood-route" d="M55 140L165 55M55 140L180 225M165 55L330 90M180 225L330 90M180 225L355 225M330 90L465 140M355 225L465 140"/>
+            </g>
+            <g transform="translate(55 140)"><circle class="radio-ring" r="34"/><text class="node-label" y="4">A</text><text class="role-label" y="55">SENDER</text></g>
+            <g transform="translate(165 55)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R1</text><text class="role-label" y="-43">REPEATER</text></g>
+            <g transform="translate(180 225)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R2</text><text class="role-label" y="49">REPEATER</text></g>
+            <g transform="translate(330 90)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R3</text><text class="role-label" y="-43">REPEATER</text></g>
+            <g transform="translate(355 225)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R4</text><text class="role-label" y="49">REPEATER</text></g>
+            <g transform="translate(465 140)"><circle class="radio-ring" r="34"/><text class="node-label" y="4">B</text><text class="role-label" y="55">RECEIVER</text></g>
+          </svg>
+          <p class="mesh-note">The first direct message spreads through eligible repeaters. Its delivery report gives the sender route information.</p>
+        </article>
+        <article class="mesh-card routing-card path-card build-item" data-build-step="2">
+          <div class="mesh-card-head"><h3 class="cyan">02 · Path routing</h3><span class="routing-badge">Known path</span></div>
+          <svg class="network-map routing-map path-map" viewBox="0 0 520 280" role="img" aria-label="Known path routing from node A through repeaters R1 and R3 to node B">
+            <g>
+              <line class="topology-link" x1="55" y1="140" x2="165" y2="55"/><line class="topology-link" x1="55" y1="140" x2="180" y2="225"/>
+              <line class="topology-link" x1="165" y1="55" x2="330" y2="90"/><line class="topology-link" x1="180" y1="225" x2="330" y2="90"/>
+              <line class="topology-link" x1="180" y1="225" x2="355" y2="225"/><line class="topology-link" x1="330" y1="90" x2="465" y2="140"/>
+              <line class="topology-link" x1="355" y1="225" x2="465" y2="140"/>
+              <path class="known-path-base" d="M55 140L165 55L330 90L465 140"/>
+              <path class="known-route" d="M55 140L165 55L330 90L465 140"/>
+            </g>
+            <g transform="translate(55 140)"><circle class="radio-ring" r="34"/><text class="node-label" y="4">A</text><text class="role-label" y="55">SENDER</text></g>
+            <g transform="translate(165 55)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R1</text><text class="role-label" y="-43">REPEATER</text></g>
+            <g class="off-path" transform="translate(180 225)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R2</text><text class="role-label" y="49">OFF PATH</text></g>
+            <g transform="translate(330 90)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R3</text><text class="role-label" y="-43">REPEATER</text></g>
+            <g class="off-path" transform="translate(355 225)"><circle class="repeater-ring" r="30"/><text class="node-label" y="4">R4</text><text class="role-label" y="49">OFF PATH</text></g>
+            <g transform="translate(465 140)"><circle class="radio-ring" r="34"/><text class="node-label" y="4">B</text><text class="role-label" y="55">RECEIVER</text></g>
+          </svg>
+          <p class="mesh-note">Later direct messages carry the learned path. Only matching repeaters relay, reducing unnecessary airtime.</p>
+        </article>
+      </div>
+      <p class="routing-fallback build-item" data-build-step="2">If a known path fails, MeshCore can fall back to flood routing and learn a new path.</p>
+    </div>
+    <div class="footer"><span class="source">DISCOVER → LEARN → REUSE · <a href="https://docs.meshcore.io/packet_format/">MeshCore packet format</a></span><span>8 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="MeshCore node types">
+    <div><span class="eyebrow">09 · Node types</span></div>
+    <div class="content">
+      <h2>Three node types turn radios into a <span class="accent">working network.</span></h2>
+      <div class="node-role-list">
+        <div class="node-role-row companion build-item"><div class="node-role-glyph">C</div><h3>Companion / client</h3><p>Pairs with a phone or computer, or runs standalone. Sends and receives messages without acting as a general repeater.</p></div>
+        <div class="node-role-row repeater build-item"><div class="node-role-glyph">R</div><h3>Repeater</h3><p>Lives high, hears far, and forwards traffic along useful paths. Repeaters form the coverage backbone.</p></div>
+        <div class="node-role-row room build-item"><div class="node-role-glyph">S</div><h3>Room server</h3><p>Works like an off-grid bulletin board, letting users share posts and retrieve unseen history after returning to coverage.</p></div>
+      </div>
+      <div class="node-role-rule build-item"><strong>Deployment best practice:</strong> keep repeater and room-server duties on separate devices so each can be placed, powered, and managed for its own job.</div>
+    </div>
+    <div class="footer"><span class="source">USER EDGE · COVERAGE BACKBONE · SHARED MESSAGE SPACE · <a href="https://github.com/meshcore-dev/MeshCore/blob/main/README.md">MeshCore firmware roles</a></span><span>9 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="Height, line of sight, and Fresnel clearance">
+    <div><span class="eyebrow">10 · The rule that matters</span></div>
+    <div class="content">
+      <h2 class="los-title"><span class="accent">Height creates clearance.</span> Line of sight alone is not enough.</h2>
+      <div class="path-profile build-item">
+        <svg viewBox="0 0 1200 300" role="img" aria-label="Terrain profile showing antenna height, direct line of sight, a first Fresnel zone, and a ridge intruding into the Fresnel zone">
+          <rect width="1200" height="300" fill="#081d2d"/>
+          <g class="profile-grid">
+            <line x1="55" y1="48" x2="1175" y2="48"/><line x1="55" y1="110" x2="1175" y2="110"/><line x1="55" y1="172" x2="1175" y2="172"/><line x1="55" y1="234" x2="1175" y2="234"/>
+            <line x1="85" y1="28" x2="85" y2="270"/><line x1="285" y1="28" x2="285" y2="270"/><line x1="485" y1="28" x2="485" y2="270"/><line x1="685" y1="28" x2="685" y2="270"/><line x1="885" y1="28" x2="885" y2="270"/><line x1="1085" y1="28" x2="1085" y2="270"/>
+          </g>
+          <g class="profile-axis"><text x="12" y="52">1000 m</text><text x="18" y="114">950</text><text x="18" y="176">900</text><text x="18" y="238">850</text><text x="72" y="286">0 km</text><text x="275" y="286">2</text><text x="475" y="286">4</text><text x="675" y="286">6</text><text x="875" y="286">8</text><text x="1068" y="286">10 km</text></g>
+          <path class="profile-fresnel" d="M85 70 C335 10 865 52 1115 130 C860 220 330 178 85 70 Z"/>
+          <path class="profile-clearance" d="M85 70 C345 148 860 184 1115 130"/>
+          <path class="profile-los" d="M85 70 L1115 130"/>
+          <path class="profile-terrain" d="M0 142 L85 128 L140 144 L205 176 L300 205 L420 214 L545 235 L650 246 L716 226 L758 186 L790 164 L820 207 L900 230 L978 218 L1040 191 L1080 171 L1115 166 L1200 170 L1200 300 L0 300 Z"/>
+          <line class="profile-mast" x1="85" y1="128" x2="85" y2="70"/><circle class="profile-radio" cx="85" cy="70" r="9"/>
+          <line class="profile-mast" x1="1115" y1="166" x2="1115" y2="130"/><circle class="profile-radio" cx="1115" cy="130" r="9"/>
+          <circle class="profile-obstruction" cx="790" cy="164" r="7"/>
+          <g class="profile-label"><text x="66" y="24">High-site repeater</text><text x="1028" y="84">Companion</text><text x="410" y="78">Direct line of sight</text><text class="red" x="520" y="34">First Fresnel zone</text><text class="amber" x="430" y="190">≈60% clearance guide</text><text class="red" x="815" y="202">Ridge pinches the zone</text></g>
+          <g class="profile-label muted"><text x="96" y="124">antenna height</text><text x="870" y="256">terrain and clutter</text></g>
+        </svg>
+      </div>
+      <div class="path-lessons">
+        <div class="path-lesson line-of-sight build-item"><b>Line of sight</b><span>The straight centerline between antennas must remain unobstructed.</span></div>
+        <div class="path-lesson height build-item"><b>Height</b><span>Moves the radio path above terrain, buildings, trees, and local noise.</span></div>
+        <div class="path-lesson fresnel build-item"><b>Fresnel clearance</b><span>Aim to keep roughly 60% of the first zone clear around that line.</span></div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">HEIGHT · LINE OF SIGHT · FRESNEL CLEARANCE · <a href="https://www.itu.int/rec/R-REC-P.526/en">ITU-R P.526</a></span><span>10 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="MeshCore security">
+    <div><span class="eyebrow">11 · Security</span></div>
+    <div class="content">
+      <h2>Repeaters move the packet. <span class="cyan">They do not read it.</span></h2>
+      <div class="grid2" style="margin-top:32px">
+        <div class="card build-item"><h3 class="accent">Private traffic</h3><ul class="clean" style="margin-top:22px"><li>Direct messages are end-to-end encrypted.</li><li>Private channels use a shared channel key.</li><li>Repeaters forward encrypted payloads.</li></ul></div>
+        <div class="card build-item"><h3 class="cyan">Public traffic</h3><ul class="clean" style="margin-top:22px"><li>Public channel messages are readable by the community.</li><li>RF activity and routing information are still observable.</li><li>Good key handling still matters.</li></ul></div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Source: <a href="https://meshcore.io/">meshcore.io</a></span><span>11 / 24</span></div>
+  </section>
+
+  <section class="slide hardware-slide build-slide" data-title="Hardware sets the power budget">
+    <div><span class="eyebrow">12 · Hardware</span></div>
+    <div class="content">
+      <h2 class="hardware-title">Your microcontroller choice determines <span class="accent">endurance, features, and cost.</span></h2>
+      <div class="hardware-compare">
+        <section class="hardware-panel esp build-item" data-build-step="1">
+          <div class="hardware-kicker">Feature-first</div>
+          <h3>ESP32 · Heltec V3</h3>
+          <div class="hardware-chip">ESP32-S3 + SX1262 · Wi-Fi + BLE + LoRa + OLED</div>
+          <div class="hardware-endurance"><strong>~1 day</strong><span>Field estimate<br>2,000 mAh · active setup</span></div>
+          <div class="hardware-battery" aria-label="Shorter illustrative battery endurance"><i></i></div>
+          <ul class="hardware-points"><li>Generally lower-cost and widely available for starter builds.</li><li>Integrated features simplify setup and experimentation.</li><li>Wi-Fi, display, and higher idle load require a larger power plan.</li></ul>
+        </section>
+        <section class="hardware-panel nrf build-item" data-build-step="2">
+          <div class="hardware-kicker">Power-first</div>
+          <h3>nRF52 · RAK4631</h3>
+          <div class="hardware-chip">nRF52840 + SX1262 · BLE + LoRa</div>
+          <div class="hardware-endurance"><strong>~1 week</strong><span>Field estimate<br>2,000 mAh · light duty</span></div>
+          <div class="hardware-battery" aria-label="Longer illustrative battery endurance"><i></i></div>
+          <ul class="hardware-points"><li>Ultra-low-power architecture; RAK specifies 2 µA module sleep current.</li><li>Common choice for solar repeaters and long-lived companions.</li><li>Higher board cost can buy a much larger energy margin.</li></ul>
+        </section>
+      </div>
+      <div class="hardware-mission build-item" data-build-step="3"><strong>Choose by mission:</strong> power budget, radio role, screen and GPS needs, expected traffic, and service interval.</div>
+      <p class="hardware-caveat build-item" data-build-step="3">Battery life varies with firmware, peripherals, radio duty cycle, transmit power, temperature, and traffic. Measure the finished node.</p>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://docs.heltec.org/en/node/esp32/wifi_lora_32/index.html">Heltec V3</a> · <a href="https://docs.rakwireless.com/product-categories/wisblock/rak4631/datasheet/">RAK4631</a></span><span>12 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="Direct message reliability">
+    <div><span class="eyebrow">13 · Direct message reliability</span></div>
+    <div class="content">
+      <h2 class="reliability-title">Direct messages can answer: <span class="accent">Did they get it?</span></h2>
+      <div class="ack-flow" aria-label="Direct message delivery and acknowledgment flow">
+        <div class="ack-node build-item" data-build-step="1"><div class="ack-node-icon" aria-hidden="true">✎</div><h3>Send</h3><p>Short, actionable message</p></div>
+        <div class="ack-arrow build-item" data-build-step="2" aria-hidden="true">→</div>
+        <div class="ack-node build-item" data-build-step="2"><div class="ack-node-icon" aria-hidden="true">⌁</div><h3>Route</h3><p>Known path or discovery</p></div>
+        <div class="ack-arrow build-item" data-build-step="3" aria-hidden="true">→</div>
+        <div class="ack-node build-item" data-build-step="3"><div class="ack-node-icon" aria-hidden="true">✓</div><h3>Receive</h3><p>Destination accepts packet</p></div>
+        <div class="ack-return build-item" data-build-step="4" aria-label="Acknowledgment returns to the sender"></div>
+      </div>
+      <div class="ack-outcomes">
+        <div class="ack-outcome build-item" data-build-step="5"><strong>Acknowledged</strong><p>The sender receives protocol-level confirmation that the destination received the direct message.</p></div>
+        <div class="ack-outcome missing build-item" data-build-step="6"><strong>Not acknowledged</strong><p>Treat delivery as unresolved: retry, rediscover the path, or use another communications layer.</p></div>
+      </div>
+      <p class="ack-caveat build-item" data-build-step="6">An ACK confirms receipt by the device, not comprehension, action, or identity beyond your contact and key procedures.</p>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://docs.meshcore.io/packet_format/">Packet format</a> · <a href="https://docs.meshcore.io/payloads/">Payload format</a></span><span>13 / 24</span></div>
+  </section>
+
+  <section class="slide build-slide" data-title="Why MeshCore">
+    <div><span class="eyebrow">14 · Why MeshCore</span></div>
+    <div class="content grid2">
+      <div>
+        <h2>Spend airtime where it <span class="accent">counts</span></h2>
+        <p class="lead" style="margin-top:22px">Companion nodes stay quiet. Dedicated repeaters carry the backbone.</p>
+        <div class="pills"><span class="pill">Companion</span><span class="pill">Repeater</span><span class="pill">Direct paths</span><span class="pill">MIT licensed</span></div>
+      </div>
+      <div class="card"><ul class="clean"><li class="build-item">One Companion node connects each person to the app.</li><li class="build-item">Repeaters handle the multi-hop RF path.</li><li class="build-item">A flood can discover a route, then direct packets follow it.</li><li class="build-item">Phone, desktop, web, and standalone clients are available.</li><li class="build-item">The network stays useful without an internet backhaul.</li></ul></div>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://meshcore.io/">meshcore.io</a> · <a href="https://docs.meshcore.io/">docs.meshcore.io</a></span><span>14 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Introducing Dixie Mesh">
+    <div><span class="eyebrow">15 · Local network</span></div>
+    <div class="content">
+      <h2>Introducing <span class="cyan">Dixie Mesh</span></h2>
+      <p class="lead" style="margin-top:20px">A Southern Utah community LoRa mesh network powered by MeshCore.</p>
+      <div class="grid2" style="margin-top:30px">
+        <div class="card">
+          <h3 class="accent">What it is</h3>
+          <ul class="clean" style="margin-top:22px">
+            <li>Low-power radios passing messages node to node.</li>
+            <li>Works without cellular service, internet, or central infrastructure.</li>
+            <li>Community-run, community-owned, and built on open MeshCore.</li>
+          </ul>
+        </div>
+        <div class="dixie-logo-card"><img src="assets/dixiemesh.png" alt="Dixie Mesh logo with a radio tower, mesh nodes, and signal graphics"></div>
+      </div>
+      <div class="pills" style="margin-top:24px">
+        <span class="pill">Companion</span>
+        <span class="pill">Repeater</span>
+        <span class="pill">910.525 MHz</span>
+        <span class="pill">dixiemesh.com</span>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Source: <a href="https://dixiemesh.com/">dixiemesh.com</a></span><span>15 / 24</span></div>
+  </section>
+
+  <section class="slide network-snapshot-slide" data-title="Dixie Mesh network snapshot">
+    <div><span class="eyebrow">16 · Network snapshot</span></div>
+    <div class="content">
+      <h2 class="network-snapshot-title">Dixie Mesh is already a <span class="accent">working regional network.</span></h2>
+      <div class="network-snapshot-layout">
+        <figure class="network-snapshot-figure">
+          <img src="assets/dixie-network-snapshot.png" alt="Map of Dixie Mesh nodes and observed radio links around St. George, Washington, Hurricane, and La Verkin">
+          <figcaption>Observed nodes and radio links across Southern Utah.</figcaption>
+        </figure>
+        <div class="network-snapshot-stats">
+          <div class="network-snapshot-stat"><span class="label">Installed roles</span><p><strong>30+</strong> repeaters<br><strong>30+</strong> companions<br><strong>4</strong> room servers</p></div>
+          <div class="network-snapshot-stat"><span class="label">Seven-day activity</span><p><strong>77</strong> unique nodes<br><strong>40,000+</strong> signal observations<br><strong>18</strong> active channels</p></div>
+          <div class="network-snapshot-stat"><span class="label">Message paths</span><p><strong>3.2</strong> average hops<br><strong>10.3 mi</strong> average hop<br><strong>23.4 mi</strong> maximum hop</p></div>
+          <p class="network-snapshot-date">Snapshot supplied August 5, 2026. The network continues to grow.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>OBSERVED NODES · OBSERVED LINKS · REAL REGIONAL TRAFFIC</span><span>16 / 24</span></div>
+  </section>
+
+  <section class="slide practical-tools-slide" data-title="MeshCore App Practical Tools">
+    <div><span class="eyebrow">17 · Live network tools</span></div>
+    <div class="content">
+      <h2 class="practical-tools-title">MeshCore App Practical Tools</h2>
+      <div class="tool-gallery" aria-label="Dixie Mesh field tool screenshots">
+        <button class="tool-shot" type="button" data-tool-preview="tech-ridge-neighbors" aria-label="Open Tech Ridge Repeater Neighbors image"><img src="assets/tech-ridge-neighbors.png" alt="Neighbor map for the Tech Ridge repeater showing sixteen linked nodes"><span><b>01</b> Tech Ridge Repeater Neighbors</span></button>
+        <button class="tool-shot" type="button" data-tool-preview="desert-canyons-neighbors" aria-label="Open Desert Canyons Repeater Neighbors image"><img src="assets/desert-canyons-neighbors.png" alt="Neighbor map for the Desert Canyons repeater showing fourteen linked nodes"><span><b>02</b> Desert Canyons Repeater Neighbors</span></button>
+        <button class="tool-shot" type="button" data-tool-preview="toquer-raptor-neighbors" aria-label="Open Toquer Raptor Repeater Neighbors image"><img src="assets/toquer-raptor-neighbors.png" alt="Neighbor map for the Toquer Raptor repeater showing forty-three linked nodes"><span><b>03</b> Toquer Raptor Repeater Neighbors</span></button>
+        <button class="tool-shot" type="button" data-tool-preview="antenna-coverage-utah-hill" aria-label="Open Antenna Coverage plus Utah Hill image"><img src="assets/antenna-coverage-utah-hill.png" alt="Antenna coverage map with four overlaid coverage layers including Utah Hill"><span><b>04</b> Antenna Coverage (+Utah Hill)</span></button>
+        <button class="tool-shot" type="button" data-tool-preview="line-of-sight-tool" aria-label="Open Line of Sight Tool image"><img src="assets/line-of-sight-tool.png" alt="Line of sight tool showing a terrain profile and Fresnel zone between two points"><span><b>05</b> Line of Sight Tool</span></button>
+        <button class="tool-shot" type="button" data-tool-preview="trace-path-tool" aria-label="Open Trace Path Tool image"><img src="assets/trace-path-tool.png" alt="Trace path tool showing a selected multi-repeater route and link margins"><span><b>06</b> Trace Path Tool</span></button>
+      </div>
+    </div>
+    <div class="footer"><span>NEIGHBORS · COVERAGE · LINE OF SIGHT · TRACE PATH</span><span>17 / 24</span></div>
+  </section>
+
+  <section class="slide hero" data-title="Q&A / Live demo">
+    <div><span class="eyebrow">18 · Q&A / live demo</span></div>
+    <div class="content">
+      <h1>Cheap. Low-power. Off-grid. <span class="accent">Worth experimenting with.</span></h1>
+      <p class="subtitle">LoRa mesh will not replace repeaters, HF, APRS, Winlink, or ARES. It adds an encrypted text and telemetry layer to the toolbox.</p>
+    </div>
+    <div class="footer"><span>QUESTIONS?</span><span>18 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Appendix">
+    <div><span class="eyebrow">19 · Appendix</span></div>
+    <div class="content"><h1>Appendix</h1></div>
+    <div class="footer"><span>OPTIONAL REFERENCE SLIDES</span><span>19 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Antennas power placement">
+    <div><span class="eyebrow">20 · What improves range</span></div>
+    <div class="content grid2">
+      <div class="card"><h2 style="font-size:clamp(34px,4vw,58px)">The radio is only <span class="cyan">one part</span> of the link</h2><ul class="clean" style="margin-top:28px"><li>Antenna matched near 910–915 MHz</li><li>Height and clear line of sight</li><li>Short, low-loss feedline</li><li>Check SWR before permanent mounting</li></ul></div>
+      <div class="card"><h3 class="accent">Small connectors, big traps</h3><ul class="clean" style="margin-top:24px"><li>U.FL and IPEX are the tiny board connector</li><li>SMA and RP-SMA differ at the center pin</li><li>Weatherproof every outdoor connection</li><li>Add drip loops and strain relief</li><li>Size batteries and solar for winter</li></ul></div>
+    </div>
+    <div class="footer"><span>ANTENNA · HEIGHT · SITE · POWER</span><span>20 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Goals of MeshCore">
+    <div><span class="eyebrow">21 · Development goals</span></div>
+    <div class="content">
+      <h2 class="meshcore-goals-title">Goals of <span class="accent">MeshCore</span></h2>
+      <p class="meshcore-goals-subtitle">From the development team</p>
+      <div class="meshcore-goals-grid">
+        <div class="meshcore-goal"><div class="meshcore-goal-number">01</div><p><strong>Reliable messaging</strong> and packet delivery</p></div>
+        <div class="meshcore-goal"><div class="meshcore-goal-number">02</div><p><strong>Minimal RF traffic</strong></p></div>
+        <div class="meshcore-goal"><div class="meshcore-goal-number">03</div><p>Ideally avoiding connecting to the <strong>internet</strong></p></div>
+        <div class="meshcore-goal"><div class="meshcore-goal-number">04</div><p><strong>MIT licensed</strong> to allow anyone to do what they want with the firmware</p></div>
+        <div class="meshcore-goal"><div class="meshcore-goal-number">05</div><p>Provide useful <strong>tooling</strong> to make mesh network deployments easy</p></div>
+        <div class="meshcore-goal"><div class="meshcore-goal-number">06</div><p>Consistent experience across <strong>Android, iOS, Windows, and macOS</strong></p></div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Source: <a href="https://github.com/meshcore-dev/MeshCore">MeshCore development team</a> · MIT licensed</span><span>21 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Meshtastic vs MeshCore">
+    <div><span class="eyebrow">22 · Side by side</span></div>
+    <div class="content">
+      <h2 style="font-size:clamp(34px,4.4vw,64px)">Meshtastic floods broadly. <span class="accent">MeshCore learns a path.</span></h2>
+      <div class="card" style="padding:14px 24px; margin-top:24px">
+        <table class="compare">
+          <thead><tr><th>Topic</th><th class="cyan">Meshtastic</th><th class="accent">MeshCore</th></tr></thead>
+          <tbody>
+            <tr><td>Relay role</td><td>Client nodes may rebroadcast</td><td>Companions stay quiet; repeaters relay</td></tr>
+            <tr><td>Routing</td><td>Managed flood routing</td><td>Flood discovery, then direct paths</td></tr>
+            <tr><td>Hop ceiling</td><td>3 by default, up to 7</td><td>Up to 64 with one-byte paths</td></tr>
+            <tr><td>Internet link</td><td>MQTT is supported</td><td>RF-first; no official backhaul</td></tr>
+            <tr><td>Best fit</td><td>Quick and casual networks</td><td>Planned local backbone</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Sources: <a href="https://docs.meshcore.io/packet_format/">MeshCore docs</a> · linked source deck</span><span>22 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="Common use cases">
+    <div><span class="eyebrow">23 · What it is actually good for</span></div>
+    <div class="content">
+      <h2>Small packets. <span class="cyan">Useful context.</span></h2>
+      <div class="grid3" style="margin-top:32px">
+        <div class="card"><h3>💬 Direct and group text</h3><p>One-to-one messages or a group conversation across the repeater network.</p></div>
+        <div class="card"><h3>⌖ Field teams</h3><p>Position and short updates for events, hikes, or search teams.</p></div>
+        <div class="card"><h3>◉ Telemetry</h3><p>Battery voltage, weather, tank levels, and other small sensor reports.</p></div>
+        <div class="card"><h3>△ Outage messaging</h3><p>Friends, family, and neighborhoods when cell and internet service are down.</p></div>
+        <div class="card"><h3>☀ Remote control</h3><p>Small commands for field hardware such as a relay or water pump.</p></div>
+        <div class="card"><h3>⚗ Club experiments</h3><p>Propagation, antennas, routes, and network design in real terrain.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>NOT A GUARANTEED LIFE-SAFETY SERVICE</span><span>23 / 24</span></div>
+  </section>
+
+  <section class="slide" data-title="dBm and link budgets">
+    <div><span class="eyebrow">24 · Radio math</span></div>
+    <div class="content">
+      <h2>A few dB can change the <span class="accent">whole path</span></h2>
+      <div class="dbm-strip">
+        <div class="dbm-cell"><b>0 dBm</b><span>1 mW</span></div>
+        <div class="dbm-cell"><b>10 dBm</b><span>10 mW</span></div>
+        <div class="dbm-cell"><b>20 dBm</b><span>100 mW</span></div>
+        <div class="dbm-cell"><b>28 dBm</b><span>630 mW</span></div>
+        <div class="dbm-cell"><b>30 dBm</b><span>1 watt</span></div>
+      </div>
+      <div class="formula">+28 dBm TX + 5 dBi antenna − 1 dB coax − 120 dB path = −88 dBm received</div>
+      <p class="lead" style="margin-top:22px">With LoRa, the receive side is the surprise. Useful packets can arrive below the noise floor.</p>
+    </div>
+    <div class="footer"><span>+3 dB ≈ DOUBLE · +10 dB = TEN TIMES</span><span>24 / 24</span></div>
+  </section>
+</main>
+
+<div class="tool-modal" id="toolModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="toolModalTitle">
+  <div class="tool-modal-panel">
+    <div class="tool-modal-head"><h3 id="toolModalTitle"></h3><button class="tool-modal-close" id="toolModalClose" type="button" aria-label="Close image viewer">×</button></div>
+    <div class="tool-modal-images" id="toolModalImages"></div>
+  </div>
+</div>
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="controls">
+  <button id="prev" aria-label="Previous slide">←</button>
+  <button id="overviewBtn" aria-label="Slide overview">▦</button>
+  <button id="full" aria-label="Fullscreen">⛶</button>
+  <button id="next" aria-label="Next slide">→</button>
+</div>
+<div class="overview" id="overview"></div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const overview = document.getElementById('overview');
+  const toolModal = document.getElementById('toolModal');
+  const toolModalTitle = document.getElementById('toolModalTitle');
+  const toolModalImages = document.getElementById('toolModalImages');
+  const toolModalClose = document.getElementById('toolModalClose');
+  const toolPreviews = {
+    'tech-ridge-neighbors': { title: 'Tech Ridge Repeater Neighbors', images: [{ src: 'assets/tech-ridge-neighbors.png', alt: 'Neighbor map for the Tech Ridge repeater showing sixteen linked nodes' }] },
+    'desert-canyons-neighbors': { title: 'Desert Canyons Repeater Neighbors', images: [{ src: 'assets/desert-canyons-neighbors.png', alt: 'Neighbor map for the Desert Canyons repeater showing fourteen linked nodes' }] },
+    'toquer-raptor-neighbors': { title: 'Toquer Raptor Repeater Neighbors', images: [{ src: 'assets/toquer-raptor-neighbors.png', alt: 'Neighbor map for the Toquer Raptor repeater showing forty-three linked nodes' }] },
+    'antenna-coverage-utah-hill': { title: 'Antenna Coverage (+Utah Hill)', images: [{ src: 'assets/antenna-coverage-utah-hill.png', alt: 'Antenna coverage map with four overlaid coverage layers including Utah Hill' }] },
+    'line-of-sight-tool': { title: 'Line of Sight Tool', images: [{ src: 'assets/line-of-sight-tool.png', alt: 'Line of sight tool showing a terrain profile and Fresnel zone between two points' }] },
+    'trace-path-tool': { title: 'Trace Path Tool', images: [{ src: 'assets/trace-path-tool.png', alt: 'Trace path tool showing a selected multi-repeater route and link margins' }] },
+    'line-of-sight': { title: 'Line of sight', images: [{ src: 'assets/lineofsight.png', alt: 'Line of Sight tool showing terrain, Fresnel clearance, and the path between two map points' }] },
+    'coverage-map': { title: 'Coverage map', images: [{ src: 'assets/coveragemap.png', alt: 'Antenna Coverage tool showing estimated coverage from four Southern Utah repeater sites' }] },
+    'path-trace': { title: 'Path trace', images: [
+      { src: 'assets/tracepath.jpeg', alt: 'Path Trace results listing repeaters, hop numbers, and signal reports' },
+      { src: 'assets/tracepathmap.jpeg', alt: 'Path Trace map showing selected repeaters and signal reports across the route' }
+    ] }
+  };
+  let lastToolTrigger = null;
+  let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+
+  function openToolPreview(key, trigger) {
+    const preview = toolPreviews[key];
+    if (!preview) return;
+    lastToolTrigger = trigger;
+    toolModalTitle.textContent = preview.title;
+    toolModalImages.classList.toggle('dual', preview.images.length > 1);
+    toolModalImages.replaceChildren(...preview.images.map(item => {
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = item.alt;
+      return img;
+    }));
+    toolModal.classList.add('show');
+    toolModal.setAttribute('aria-hidden', 'false');
+    toolModalClose.focus();
+  }
+
+  function closeToolPreview() {
+    toolModal.classList.remove('show');
+    toolModal.setAttribute('aria-hidden', 'true');
+    toolModalImages.replaceChildren();
+    if (lastToolTrigger) lastToolTrigger.focus();
+  }
+
+  function resetBuild(slide) {
+    if (!slide?.classList.contains('build-slide')) return;
+    slide.querySelectorAll('.build-item').forEach(item => item.classList.remove('revealed'));
+  }
+
+  function revealNextBuild(slide) {
+    if (!slide?.classList.contains('build-slide')) return false;
+    const nextItem = [...slide.querySelectorAll('.build-item')].find(item => !item.classList.contains('revealed'));
+    if (!nextItem) return false;
+    const step = nextItem.dataset.buildStep;
+    const items = step
+      ? [...slide.querySelectorAll('.build-item')].filter(item => item.dataset.buildStep === step)
+      : [nextItem];
+    items.forEach(item => item.classList.add('revealed'));
+    return true;
+  }
+
+  function revealAllBuild(slide) {
+    if (!slide?.classList.contains('build-slide')) return;
+    slide.querySelectorAll('.build-item').forEach(item => item.classList.add('revealed'));
+  }
+
+  function removeLastBuild(slide) {
+    if (!slide?.classList.contains('build-slide')) return false;
+    const revealedItems = [...slide.querySelectorAll('.build-item.revealed')];
+    const lastItem = revealedItems.at(-1);
+    if (!lastItem) return false;
+    const step = lastItem.dataset.buildStep;
+    const items = step
+      ? revealedItems.filter(item => item.dataset.buildStep === step)
+      : [lastItem];
+    items.forEach(item => item.classList.remove('revealed'));
+    return true;
+  }
+
+  function show(i, buildState = 'reset') {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle('active', n === index));
+    if (buildState === 'complete') revealAllBuild(slides[index]);
+    else resetBuild(slides[index]);
+    progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+    counter.textContent = `${String(index + 1).padStart(2,'0')} / ${slides.length}`;
+    location.hash = index + 1;
+  }
+  const next = () => show(index + 1);
+  const prev = () => {
+    if (removeLastBuild(slides[index])) return;
+    if (index > 0) show(index - 1, 'complete');
+  };
+  document.getElementById('next').onclick = next;
+  document.getElementById('prev').onclick = prev;
+  document.getElementById('overviewBtn').onclick = () => overview.classList.toggle('show');
+  document.getElementById('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  document.getElementById('deck').addEventListener('click', e => {
+    if (e.target.closest('button, a')) return;
+    revealNextBuild(slides[index]);
+  });
+
+  slides.forEach((slide, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    thumb.innerHTML = `<span>${String(i + 1).padStart(2,'0')}</span><b>${slide.dataset.title}</b>`;
+    thumb.onclick = () => { overview.classList.remove('show'); show(i); };
+    overview.appendChild(thumb);
+  });
+
+  document.querySelectorAll('[data-tool-preview]').forEach(card => {
+    card.addEventListener('click', () => openToolPreview(card.dataset.toolPreview, card));
+  });
+  toolModalClose.addEventListener('click', closeToolPreview);
+  toolModal.addEventListener('click', e => { if (e.target === toolModal) closeToolPreview(); });
+
+  document.addEventListener('keydown', e => {
+    if (toolModal.classList.contains('show')) {
+      if (e.key === 'Escape') closeToolPreview();
+      return;
+    }
+    if (e.target.closest && e.target.closest('[data-tool-preview]') && [' ', 'Enter'].includes(e.key)) return;
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); if (!revealNextBuild(slides[index])) next(); }
+    if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key.toLowerCase() === 'o') overview.classList.toggle('show');
+    if (e.key.toLowerCase() === 'f') document.getElementById('full').click();
+    if (e.key === 'Escape') overview.classList.remove('show');
+  });
+
+  let touchX = null;
+  document.addEventListener('touchstart', e => {
+    if (toolModal.classList.contains('show')) return;
+    touchX = e.touches[0].clientX;
+  }, {passive:true});
+  document.addEventListener('touchend', e => {
+    if (toolModal.classList.contains('show')) return;
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+    touchX = null;
+  }, {passive:true});
+
+  function playIllustrativeChirp() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    for (let i = 0; i < 8; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(700 + i * 70, now + i * .06);
+      osc.frequency.exponentialRampToValueAtTime(4800 - i * 120, now + i * .06 + .18);
+      gain.gain.setValueAtTime(.0001, now + i * .06);
+      gain.gain.exponentialRampToValueAtTime(.12, now + i * .06 + .02);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + i * .06 + .18);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * .06);
+      osc.stop(now + i * .06 + .2);
+    }
+  }
+  const chirpWaterfall = document.getElementById('chirpWaterfall');
+  chirpWaterfall.addEventListener('click', playIllustrativeChirp);
+  chirpWaterfall.addEventListener('keydown', e => {
+    if (!['Enter', ' '].includes(e.key)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    playIllustrativeChirp();
+  });
+  show(index);
+</script>
+</body>
+</html>
