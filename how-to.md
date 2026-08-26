@@ -35,7 +35,7 @@ list, and you're welcome to spin up your own for a topic or area.
 | Channel | What it's for |
 | --- | --- |
 | **`#alerts`** | Community-wide announcements and heads-up notices: mesh news, planned outages, events, and other things worth broadcasting. Not for emergencies — see `#emergency`. |
-| **`#dixiemesh`** | General discussion about Dixie Mesh itself: the network, the [dixiemesh.com](https://dixiemesh.com) website, the [live map](https://live.dixiemesh.com/#/live), and other community tools. |
+| **`#dixiemesh`** | Local Washington County area chat. Use it for day-to-day conversation, questions, events, and coordination with other people on the mesh in Washington County. |
 | **`#emergency`** | Real-time emergency and life-safety communications **only**. Keep this channel clear so urgent traffic gets through; take non-urgent chatter elsewhere. |
 | **`#hamradio`** | Amateur radio talk: licensing, nets, gear, repeaters, and general ham discussion. |
 | **`#repeater-ops`** | For folks running mesh infrastructure — coordinate repeater placement and config, announce maintenance or outages, and compare notes on keeping nodes healthy. |
@@ -47,6 +47,12 @@ list, and you're welcome to spin up your own for a topic or area.
 > `#emergency` reserved for real emergencies, and remember everything on a public
 > channel is readable by anyone on the mesh. For anything sensitive, use a direct
 > message or a private channel.
+
+## Presentations
+
+These presentations are available to view and share:
+
+- [Texting Without Towers: Off-Grid Messaging with MeshCore](/presentations/texting-without-towers/): An introduction to LoRa, MeshCore, and the Dixie Mesh network.
 
 ## Frequently asked questions
 
