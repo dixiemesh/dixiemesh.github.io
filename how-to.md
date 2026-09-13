@@ -48,6 +48,53 @@ list, and you're welcome to spin up your own for a topic or area.
 > channel is readable by anyone on the mesh. For anything sensitive, use a direct
 > message or a private channel.
 
+## Configuring Repeaters
+
+Recommended advert, loop detection, and delay settings for repeaters on the
+Intermountain West mesh — these keep airtime efficient and cut down on
+duplicate/looped traffic as the mesh grows. Full details:
+[Advert, Loop Detection, and Delay Settings (PDF)](/assets/docs/advert-loop-detection-delays.pdf).
+
+### Advert interval
+
+Set your advert interval to **47 hours**. That's often enough to stay
+discoverable, but not so often — or so regular — that adverts pile up at the
+same time every day.
+
+### Loop detection
+
+On any repeater that supports it, run:
+
+```
+set loop.detect moderate
+```
+
+With `loop.detect` set to `moderate`:
+
+- **1-byte path** — rejects the packet if its own ID appears 2 times.
+- **2-byte & 3-byte path** — rejects the packet if its own ID appears 1 time.
+
+### Delays
+
+- **`txdelay`** — the random wait before retransmitting flood packets. A
+  higher value gives nearby nodes more time to transmit first, reducing
+  collisions.
+- **`direct.txdelay`** — the same idea for direct packets, usually set lower
+  for faster delivery.
+- **`rxdelay`** — prioritizes stronger copies of a packet and can discard
+  weaker duplicates.
+
+These can be set via CLI or when flashing a repeater. Pick the row that
+matches your neighbor count:
+
+| Neighbors | `txdelay` | `direct.txdelay` | `rxdelay` |
+| --- | --- | --- | --- |
+| 20+ | 2 | 2 | 3 |
+| 10–19 | 1.5 | 1 | 3 |
+| 5–9 | 0.8 | 0.4 | 3 |
+| 1–4 | 0.3 | 0.1 | 3 |
+| Mobile repeaters (vehicle nodes) | 2 | 2 | 3 |
+
 ## Presentations
 
 These presentations are available to view and share:
