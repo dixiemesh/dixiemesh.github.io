@@ -158,6 +158,42 @@ companions at a glance.
 - **Companions:** name it anything familiar to you — your name, callsign, or a
   nickname all work fine.
 
+## Region Scopes
+
+As the Intermountain West mesh has grown, repeaters now support **Region
+Scopes** — routing labels (like `stg` or `ut`) that control which parts of the
+mesh a repeater participates in. A repeater only forwards packets that match
+its allowed region list and drops everything else at the boundary, which keeps
+local airtime clear and lowers the chance of congestion.
+
+Dixie Mesh sits in the `imw` → `ut` → `s-ut` (Southern Utah) → `stg`
+(St. George) branch of the region tree. Full details, the region map, and
+worked examples:
+
+- [Region Tagging Guide (infographic)](/assets/img/region-tagging-guide.png)
+- [Region Scopes reference (PDF)](/assets/docs/region-scopes.pdf)
+
+The short version — pick the convention that matches your repeater:
+
+- **If your repeater is local to you** (a rooftop node covering just your
+  immediate area), use the **local** convention: scope it to `stg` only.
+- **If your repeater provides regional support** (high elevation, relaying for
+  St. George *and* the wider Southern Utah area), use the **regional**
+  convention: scope it to `ut, s-ut, stg`.
+
+Either way, deny unscoped traffic so unconfigured nodes don't flood your
+relay:
+
+```
+region denyf *
+```
+
+For your **companion**, set the default region to `stg` (or `imw` if you want
+it to hear the whole mesh). To keep the `Public` channel working the way it
+always has, set its region scope to `imw` — and do the same for any other
+channel: give it the smallest region it actually needs, and keep local groups
+local.
+
 ## Verifying your node works
 
 1. **Say hello on the public channel.** Open the `Public` channel and send a
