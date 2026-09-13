@@ -144,6 +144,12 @@ a:hover { color: var(--brand-blue-dark); }
   color: var(--brand-white);
 }
 
+.content th code {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--brand-white);
+}
+
 .content tr:nth-child(even) td { background: #eef3f8; }
 
 /* Inline + block code */
