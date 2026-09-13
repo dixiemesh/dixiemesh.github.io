@@ -193,11 +193,11 @@ region denyf *
 
 ### Companion Configuration
 
-For your **companion**, set the default region to `stg` (or `imw` if you want
-it to hear the whole mesh). To keep the `Public` channel working the way it
-always has, set its region scope to `imw` — and do the same for any other
-channel: give it the smallest region it actually needs, and keep local groups
-local.
+For your **companion**, set the default region to `stg` for local-only
+traffic, or `s-ut` if you want to hear all of Southern Utah. To keep the
+`Public` channel working the way it always has, set its region scope to `imw`
+— and do the same for any other channel: give it the smallest region it
+actually needs, and keep local groups local.
 
 ## Verifying your node works
 
