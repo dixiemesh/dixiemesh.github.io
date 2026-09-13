@@ -173,13 +173,16 @@ worked examples:
 - [Region Tagging Guide (infographic)](/assets/img/region-tagging-guide.png)
 - [Region Scopes reference (PDF)](/assets/docs/region-scopes.pdf)
 
+### Repeater Configuration
+
 The short version — pick the convention that matches your repeater:
 
 - **If your repeater is local to you** (a rooftop node covering just your
-  immediate area), use the **local** convention: scope it to `stg` only.
-- **If your repeater provides regional support** (high elevation, relaying for
-  St. George *and* the wider Southern Utah area), use the **regional**
-  convention: scope it to `ut, s-ut, stg`.
+  immediate area), use the **local** convention: scope it to `s-ut, stg` only
+  or just `stg`.
+- **If your repeater provides regional support** (relaying for St. George
+  *and* the wider Southern Utah area), use the **regional** convention: scope
+  it to `ut, s-ut, stg`.
 
 Either way, deny unscoped traffic so unconfigured nodes don't flood your
 relay:
@@ -187,6 +190,8 @@ relay:
 ```
 region denyf *
 ```
+
+### Companion Configuration
 
 For your **companion**, set the default region to `stg` (or `imw` if you want
 it to hear the whole mesh). To keep the `Public` channel working the way it

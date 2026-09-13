@@ -34,3 +34,8 @@ Dixie Mesh grows with every new node. If you'd like to join the network, set up
 your own device, or just learn more, follow along as we add guides here.
 
 More documentation is on the way — check back soon.
+
+## Intermountain Mesh
+
+Dixie Mesh is part of the Mountain West mesh community network. Learn more at
+[https://mwmesh.com/](https://mwmesh.com/).
