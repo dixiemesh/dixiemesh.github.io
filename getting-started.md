@@ -184,8 +184,8 @@ The short version — pick the convention that matches your repeater:
   *and* the wider Southern Utah area), use the **regional** convention: scope
   it to `ut, s-ut, stg`.
 
-Either way, deny unscoped traffic so unconfigured nodes don't flood your
-relay:
+To deny unscoped traffic so unconfigured nodes don't flood your relay, use the
+following command:
 
 ```
 region denyf *
