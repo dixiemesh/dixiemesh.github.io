@@ -55,6 +55,14 @@ Intermountain West mesh — these keep airtime efficient and cut down on
 duplicate/looped traffic as the mesh grows. Full details:
 [Advert, Loop Detection, and Delay Settings (PDF)](/assets/docs/advert-loop-detection-delays.pdf).
 
+<video controls preload="metadata" style="max-width: 100%;">
+  <source src="/assets/video/repeater-advanced-settings.mp4" type="video/mp4">
+  Your browser doesn't support embedded video.
+  <a href="/assets/video/repeater-advanced-settings.mp4">Download the video</a>.
+</video>
+
+*Video walkthrough: setting these values on a repeater from the MeshCore app.*
+
 ### Advert interval
 
 Set your advert interval to **47 hours**. That's often enough to stay
