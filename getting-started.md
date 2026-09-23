@@ -189,6 +189,14 @@ use the following command:
 region denyf *
 ```
 
+<video controls preload="metadata" style="max-width: 100%;">
+  <source src="/assets/video/region-scope-config.mp4" type="video/mp4">
+  Your browser doesn't support embedded video.
+  <a href="/assets/video/region-scope-config.mp4">Download the video</a>.
+</video>
+
+*Video walkthrough: configuring region scopes on a repeater from the MeshCore app.*
+
 ### Companion Configuration
 
 On your **companion**, scope the `Public` channel to `imw` if you want to
