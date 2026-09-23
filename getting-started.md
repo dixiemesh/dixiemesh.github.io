@@ -197,6 +197,15 @@ region denyf *
 
 *Video walkthrough: configuring region scopes on a repeater from the MeshCore app.*
 
+You can also configure region scopes from the repeater's command line
+(CLI/console) with the following commands:
+
+```
+region def imw ut s-ut stg
+region default s-ut
+region save
+```
+
 ### Companion Configuration
 
 On your **companion**, scope the `Public` channel to `imw` if you want to
