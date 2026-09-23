@@ -189,7 +189,7 @@ use the following command:
 region denyf *
 ```
 
-<video controls preload="metadata" style="width: 100%; max-width: 370px;">
+<video controls preload="metadata" style="width: 100%; max-width: 315px;">
   <source src="/assets/video/region-scope-config.mp4" type="video/mp4">
   Your browser doesn't support embedded video.
   <a href="/assets/video/region-scope-config.mp4">Download the video</a>.
