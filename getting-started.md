@@ -167,25 +167,23 @@ its allowed region list and drops everything else at the boundary, which keeps
 local airtime clear and lowers the chance of congestion.
 
 Dixie Mesh sits in the `imw` → `ut` → `s-ut` (Southern Utah) → `stg`
-(St. George) branch of the region tree. Full details, the region map, and
-worked examples:
-
-- [Region Tagging Guide (infographic)](/assets/img/region-tagging-guide.png)
-- [Region Scopes reference (PDF)](/assets/docs/region-scopes.pdf)
+(St. George) branch of the region tree. For the full tree, see the
+[Region Trees reference (PDF)](/assets/docs/region-trees.pdf).
 
 ### Repeater Configuration
 
-The short version — pick the convention that matches your repeater:
+Every Dixie Mesh repeater should be configured with the same regions: `ut`,
+`s-ut`, and `stg`, plus `imw` so it participates in the Intermountain West
+public channel. Set the **default region scope** to `s-ut`. The only
+difference is how you handle unscoped traffic:
 
 - **If your repeater is local to you** (a rooftop node covering just your
-  immediate area), use the **local** convention: scope it to `s-ut, stg` only
-  or just `stg`.
-- **If your repeater provides regional support** (relaying for St. George
-  *and* the wider Southern Utah area), use the **regional** convention: scope
-  it to `ut, s-ut, stg`.
+  immediate area), we recommend you keep **allowing unscoped traffic**.
+- **If your repeater provides regional support**, **deny unscoped traffic**.
 
-To deny unscoped traffic so unconfigured nodes don't flood your relay, use the
-following command:
+If your repeater sits on the boundary and receives traffic from outside
+`s-ut`, it is especially important that you deny unscoped traffic. To do that,
+use the following command:
 
 ```
 region denyf *
@@ -193,11 +191,9 @@ region denyf *
 
 ### Companion Configuration
 
-For your **companion**, set the default region to `stg` for local-only
-traffic, or `s-ut` if you want to hear all of Southern Utah. To keep the
-`Public` channel working the way it always has, set its region scope to `imw`
-— and do the same for any other channel: give it the smallest region it
-actually needs, and keep local groups local.
+On your **companion**, scope the `Public` channel to `imw` if you want to
+participate in the full Intermountain West public channel. Otherwise, set it
+to `ut` for just Utah, or `s-ut` for the Dixie Mesh area.
 
 ## Verifying your node works
 
